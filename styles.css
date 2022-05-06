@@ -1,0 +1,28 @@
+body {
+  background-color: rgb(56, 56, 56);
+}
+#canvas {
+  margin: auto;
+  background-color: rgb(73, 73, 73);
+}
+
+#gamefield {
+  height: 1024;
+  width: 1024;
+  box-shadow: 4px 4px 24px 5px rgb(102, 148, 101);
+  margin: auto;
+}
+
+#game-info {
+  position: absolute;
+  font-size: 100;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  top: 0;
+}
+
+#SNAKE {
+  background-color: red;
+  height: 100;
+  width: 500;
+  margin-left: 600;
+}
