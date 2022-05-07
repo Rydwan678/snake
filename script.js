@@ -3,11 +3,12 @@
 // statystyki (score, level, czas)
 
 // levele
-// - 1-10 poziomow
+// - 1-10 Levelow
 // - co level zmiana speeda
 // - co level dodanie sie cegly
-// - celem kazdego poziomu jest 10 jablek
+// - celem kazdego Levelu jest 10 jablek
 // game over i play again / win i play again
+// 10 level 80 speeda
 
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
@@ -53,7 +54,7 @@ let snake = [
   [0, 0],
 ];
 
-let snakeSpeed = 316;
+let snakeSpeed = 250;
 let apple = [];
 let score = 0;
 let lose = false;
@@ -65,18 +66,26 @@ let bricks = [];
 canvas.width = "1024";
 canvas.height = "1024";
 
-levelCounter.textContent = `Poziom: ${currentLevel}`;
-scoreCounter.textContent = `Punkty: ${score}`;
+levelCounter.textContent = `Level: ${currentLevel}`;
+scoreCounter.textContent = `Points: ${score}`;
 
 const changeWay = (e) => {
   if (e.key == "w") {
-    direction = "up";
+    if (direction !== "down") {
+      direction = "up";
+    }
   } else if (e.key == "s") {
-    direction = "down";
+    if (direction !== "up") {
+      direction = "down";
+    }
   } else if (e.key == "a") {
-    direction = "left";
+    if (direction !== "right") {
+      direction = "left";
+    }
   } else if (e.key == "d") {
-    direction = "right";
+    if (direction !== "left") {
+      direction = "right";
+    }
   }
 };
 
@@ -91,7 +100,9 @@ const checkGameLevel = () => {
     ];
     direction = "right";
     currentLevel += 1;
-    snakeSpeed -= 40;
+    snakeSpeed -= 100;
+    clearInterval(play);
+    setInterval(moveSnake, snakeSpeed);
     chooseSnakeElement();
     setBricks();
     // drawBricks()
@@ -127,8 +138,8 @@ const moveSnake = () => {
     gameLose();
   } else if (checkGameLevel() == true) {
     console.log("nowylevel");
-    levelCounter.textContent = `Poziom: ${currentLevel}`;
-    scoreCounter.textContent = `Punkty: ${score}`;
+    levelCounter.textContent = `Level: ${currentLevel}`;
+    scoreCounter.textContent = `Points: ${score}`;
   } else {
     chooseSnakeElement();
     drawBricks();
@@ -141,8 +152,8 @@ const play = setInterval(moveSnake, snakeSpeed);
 
 const checkScore = () => {
   if (snake[0][0] == apple[0] && snake[0][1] == apple[1]) {
-    score += 1;
-    scoreCounter.textContent = `Punkty: ${score}`;
+    score += 5;
+    scoreCounter.textContent = `Points: ${score}`;
     eatSound.play();
     setApple();
     let lastElementX = snake[snake.length - 1][0];
@@ -212,6 +223,11 @@ const setApple = () => {
   // if apple has been spawned in player, create new position
   for (let i = 0; i < snake.length; i++) {
     if (snake[i][0] == apple[0] && snake[i][1] == apple[1]) {
+      setApple();
+    }
+  }
+  for (let i = 0; i < bricks.length; i++) {
+    if (bricks[i][0] == apple[0] && bricks[i][1] == apple[1]) {
       setApple();
     }
   }
