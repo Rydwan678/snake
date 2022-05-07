@@ -3,13 +3,29 @@
     <link href="styles.css" rel="stylesheet" />
   </head>
   <body>
-    <div id="gamefield">
-      <canvas id="canvas"></canvas>
+    <div id="popup">
+      <p id="counting-down"></p>
     </div>
-    <div id="game-info">
-      <p id="score"></p>
-      <p id="level"></p>
+    <div id="main" class="hide">
+      <div id="gamefield">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div id="game-info">
+        <p id="score"></p>
+        <p id="level"></p>
+      </div>
     </div>
+
+    <!-- <div id="game-title">
+    <h1>SNAKE GAME</h1>
+    </div>
+    <div id="rules">
+      <p class="rule">- there are 10 levels to complete</p>
+      <p class="rule">- get 10 points to complete level</p>
+      <p class="rule">- every level snake becomes faster and more obstacles appear</p>
+      <p class="rule">- if you hit yourself, gameborder or brick, you lose</p>
+      <p class="rule">- to win, complete all 10 levels</p>
+    </div> -->
 
     <script src="script.js"></script>
   </body>

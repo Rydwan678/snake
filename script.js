@@ -13,6 +13,8 @@
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
 
+const gameScreen = document.querySelector("#main");
+const countDownNumber = document.querySelector("#counting-down");
 const scoreCounter = document.querySelector("#score");
 const levelCounter = document.querySelector("#level");
 
@@ -103,7 +105,7 @@ const checkGameLevel = () => {
     direction = "right";
     currentLevel += 1;
     snakeSpeed -= 12;
-    clearInterval(play);
+    clearInterval(autoMove);
     setAutoMove();
     // setAutoMove();
     chooseSnakeElement();
@@ -210,7 +212,7 @@ const checkCollision = () => {
 };
 
 const gameLose = () => {
-  clearInterval(play);
+  clearInterval(autoMove);
   console.log("przegrales");
 };
 
@@ -338,10 +340,26 @@ const chooseSnakeElement = () => {
 };
 
 const setAutoMove = () => {
-  play = setInterval(moveSnake, snakeSpeed);
+  autoMove = setInterval(moveSnake, snakeSpeed);
 };
 
+const startGame = () => {
+  gameScreen.classList.remove("hide");
+  setTimeout(setAutoMove, 4000);
+  setTimeout(() => {
+    countDownNumber.textContent = "READY";
+    setTimeout(() => {
+      countDownNumber.textContent = "STEADY";
+      setTimeout(() => {
+        countDownNumber.textContent = "GO!";
+        setTimeout(() => {
+          countDownNumber.classList.add("hide");
+        }, 1000);
+      }, 1000);
+    }, 1000);
+  }, 1000);
+};
+startGame();
 document.addEventListener("keydown", changeWay);
 window.addEventListener("load", setApple);
 window.addEventListener("load", chooseSnakeElement);
-window.addEventListener("load", setAutoMove);

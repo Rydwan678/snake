@@ -1,14 +1,30 @@
 body {
   background-color: rgb(44, 44, 44);
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
 }
 
-#game-title {
-  text-transform: uppercase;
+.blur {
+  opacity: 20%;
+}
+
+.hide {
+  opacity: 0%;
+}
+
+#popup {
+  display: flex;
+  position: absolute;
+  align-items: center;
+  height: 20vh;
+  width: 20vh;
+  justify-content: center;
+}
+
+#counting-down {
+  font-size: 50px;
+  font-weight: 900;
   color: white;
   text-shadow: 5px 3px 10px rgb(102, 148, 101);
-  font-size: 120;
-  margin: auto;
-  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
 }
 
 #gamefield {
@@ -26,11 +42,9 @@ body {
   position: relative;
   height: 10vh;
   width: 40vh;
-  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   font-size: 5vh;
   color: white;
   text-shadow: 5px 3px 10px rgb(102, 148, 101);
-  background-color: red;
 }
 
 #SNAKE {
@@ -38,4 +52,26 @@ body {
   height: 100;
   width: 500;
   margin-left: 600;
+}
+
+#game-title {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  bottom: 80vh;
+}
+
+h1 {
+  text-transform: uppercase;
+  color: white;
+  text-shadow: 5px 3px 10px rgb(102, 148, 101);
+  font-size: 50;
+}
+
+#rules {
+  background-color: red;
+  text-transform: uppercase;
+  color: white;
+  text-shadow: 5px 3px 10px rgb(102, 148, 101);
+  font-size: 30;
 }
