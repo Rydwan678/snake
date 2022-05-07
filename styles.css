@@ -1,6 +1,22 @@
 body {
   background-color: rgb(56, 56, 56);
 }
+
+#test {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
+
+#game-title {
+  text-transform: uppercase;
+  color: white;
+  text-shadow: 5px 3px 10px rgb(102, 148, 101);
+  font-size: 120;
+  margin: auto;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+
 #canvas {
   margin: auto;
   background-color: rgb(73, 73, 73);

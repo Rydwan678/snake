@@ -55,8 +55,9 @@ let snake = [
 
 let snakeSpeed = 316;
 let apple = [];
-let score = 9;
+let score = 0;
 let lose = false;
+let counter = 0;
 
 let currentLevel = 1;
 let bricks = [];
@@ -88,9 +89,12 @@ const checkGameLevel = () => {
       [64, 0],
       [0, 0],
     ];
+    direction = "right";
     currentLevel += 1;
-    snakeSpeed -= 24;
+    snakeSpeed -= 40;
     chooseSnakeElement();
+    setBricks();
+    // drawBricks()
     return true;
   } else {
     return false;
@@ -119,6 +123,7 @@ const moveSnake = () => {
     snake[0][1] += 64;
   }
   if (checkCollision() == true) {
+    console.log("collision true");
     gameLose();
   } else if (checkGameLevel() == true) {
     console.log("nowylevel");
@@ -126,9 +131,10 @@ const moveSnake = () => {
     scoreCounter.textContent = `Punkty: ${score}`;
   } else {
     chooseSnakeElement();
+    drawBricks();
+    console.log(snake);
   }
   checkScore();
-  console.log(speedSnake);
 };
 
 const play = setInterval(moveSnake, snakeSpeed);
@@ -146,26 +152,47 @@ const checkScore = () => {
 };
 
 const checkCollision = () => {
+  // counter is for disabling collison with bricks for first 3 moves in new round to avoid losing instantly
+  counter += 1;
+  let snakeHeadPositionX = snake[0][0];
+  let snakeHeadPositionY = snake[0][1];
+  // check if snake collided with brick
+  if (counter > 3) {
+    for (let i = 0; i < bricks.length; i++) {
+      let brickPositionX = bricks[i][0];
+      let brickPositionY = bricks[i][1];
+      if (
+        snakeHeadPositionX == brickPositionX &&
+        snakeHeadPositionY == brickPositionY
+      ) {
+        return true;
+      }
+    }
+  }
   // check if snake collided with himself
   for (let i = 1; i < snake.length; i++) {
-    if (snake[0][0] == snake[i][0] && snake[0][1] == snake[i][1]) {
-      return true;
-    }
-    // check if snake collided with game field border
-    else if (
-      snake[0][0] < 0 ||
-      snake[0][0] > 960 ||
-      snake[0][1] < 0 ||
-      snake[0][1] > 960
+    let snakePartPositionX = snake[i][0];
+    let snakePartPositionY = snake[i][1];
+    if (
+      snakePartPositionX == snakeHeadPositionX &&
+      snakePartPositionY == snakeHeadPositionY
     ) {
       return true;
     }
+  }
+  // check if snake collided with game field border
+  if (
+    snakeHeadPositionX < 0 ||
+    snakeHeadPositionX > 960 ||
+    snakeHeadPositionY < 0 ||
+    snakeHeadPositionY > 960
+  ) {
+    return true;
   }
 };
 
 const gameLose = () => {
   clearInterval(play);
-  ctx.clearRect(0, 0, 512, 512);
   console.log("przegrales");
 };
 
@@ -190,13 +217,29 @@ const setApple = () => {
   }
 };
 
-const setBrick = () => {
-  if (currentLevel > 0) {
-    for (let i = 0; i < currentLevel + 5; i++) {
-      let positionX = getRandomPosition();
-      let positionY = getRandomPosition();
-      bricks.push([positionX, positionY]);
-    }
+const setBricks = () => {
+  for (let i = 0; i < 5; i++) {
+    let positionX = getRandomPosition();
+    let positionY = getRandomPosition();
+    bricks.push([positionX, positionY]);
+  }
+};
+
+const drawBricks = () => {
+  for (let i = 0; i < bricks.length; i++) {
+    let brickPositionX = bricks[i][0];
+    let brickPositionY = bricks[i][1];
+    ctx.drawImage(
+      brickIcon,
+      0,
+      0,
+      64,
+      64,
+      brickPositionX,
+      brickPositionY,
+      64,
+      64
+    );
   }
 };
 
@@ -270,6 +313,8 @@ const chooseSnakeElement = () => {
     }
   }
 };
+
+const winPopup = () => {};
 
 document.addEventListener("keydown", changeWay);
 window.addEventListener("load", setApple);
