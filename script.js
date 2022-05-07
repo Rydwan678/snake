@@ -13,8 +13,12 @@
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
 
-const gameScreen = document.querySelector("#main");
-const countDownNumber = document.querySelector("#counting-down");
+const gameScreen = document.querySelector("#main-screen");
+const gameInfo = document.querySelector("#game-info");
+const startScreen = document.querySelector("#start-screen");
+const startButton = document.querySelector("#start-button");
+
+const countDownNumber = document.querySelector("#number");
 const scoreCounter = document.querySelector("#score");
 const levelCounter = document.querySelector("#level");
 
@@ -69,8 +73,8 @@ let bricks = [];
 canvas.width = "1024";
 canvas.height = "1024";
 
-levelCounter.textContent = `Level: ${currentLevel}`;
-scoreCounter.textContent = `Points: ${score}`;
+levelCounter.textContent = currentLevel;
+scoreCounter.textContent = score;
 
 const changeWay = (e) => {
   if (e.key == "w") {
@@ -344,6 +348,7 @@ const setAutoMove = () => {
 };
 
 const startGame = () => {
+  startScreen.classList.add("hide");
   gameScreen.classList.remove("hide");
   setTimeout(setAutoMove, 4000);
   setTimeout(() => {
@@ -354,12 +359,15 @@ const startGame = () => {
         countDownNumber.textContent = "GO!";
         setTimeout(() => {
           countDownNumber.classList.add("hide");
+          gameInfo.classList.remove("hide");
+          gameScreen.classList.remove("blur");
+          gameScreen.classList.remove("hide");
         }, 1000);
       }, 1000);
     }, 1000);
   }, 1000);
 };
-startGame();
+startButton.addEventListener("click", startGame);
 document.addEventListener("keydown", changeWay);
 window.addEventListener("load", setApple);
 window.addEventListener("load", chooseSnakeElement);

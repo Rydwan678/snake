@@ -1,28 +1,37 @@
 body {
-  background-color: rgb(44, 44, 44);
+  /* background-color: rgb(44, 44, 44); */
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  background: linear-gradient(rgb(36, 36, 36), rgb(20, 9, 16));
 }
 
 .blur {
+  height: 100%;
+  width: 100%;
   opacity: 20%;
 }
 
 .hide {
-  opacity: 0%;
-}
-
-#popup {
-  display: flex;
-  position: absolute;
-  align-items: center;
-  height: 20vh;
-  width: 20vh;
-  justify-content: center;
+  display: none;
+  opacity: 0;
 }
 
 #counting-down {
-  font-size: 50px;
-  font-weight: 900;
+  display: flex;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: auto;
+  top: 30%;
+  width: 50vh;
+  height: 25vh;
+  justify-content: center;
+}
+
+#number {
+  margin: auto;
+  text-align: center;
+  font-size: 20vh;
+  position: absolute;
   color: white;
   text-shadow: 5px 3px 10px rgb(102, 148, 101);
 }
@@ -35,43 +44,53 @@ body {
   width: 80vh;
   box-shadow: 4px 4px 24px 5px rgb(102, 148, 101);
   margin: auto;
+  border-radius: 30px;
 }
 
-#game-info {
-  display: flex;
-  position: relative;
-  height: 10vh;
-  width: 40vh;
-  font-size: 5vh;
-  color: white;
-  text-shadow: 5px 3px 10px rgb(102, 148, 101);
-}
-
-#SNAKE {
-  background-color: red;
-  height: 100;
-  width: 500;
-  margin-left: 600;
+#start-screen {
+  position: absolute;
+  text-align: center;
+  width: 100%;
+  height: 70vh;
+  left: 0;
+  right: 0;
+  top: 50;
 }
 
 #game-title {
-  display: flex;
-  position: relative;
-  justify-content: center;
-  bottom: 80vh;
-}
-
-h1 {
-  text-transform: uppercase;
+  font-size: 5vh;
+  margin-top: -5%;
   color: white;
-  text-shadow: 5px 3px 10px rgb(102, 148, 101);
-  font-size: 50;
+  text-shadow: 10px 6px 15px rgb(102, 148, 101);
 }
 
 #rules {
-  background-color: red;
-  text-transform: uppercase;
+  display: flex;
+  flex-flow: column;
+  font-size: 3vh;
   color: white;
   text-shadow: 5px 3px 10px rgb(102, 148, 101);
-  font-size: 30;
+  text-transform: lowercase;
+}
+
+#start-button {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: auto;
+  display: flex;
+  background: linear-gradient(rgb(36, 36, 36), rgb(20, 9, 16));
+  height: 6vh;
+  width: 25vh;
+  border-radius: 50px;
+  border-color: rgb(102, 148, 101);
+  border-style: solid;
+  justify-content: center;
+}
+
+#start {
+  color: rgb(255, 255, 255);
+  text-shadow: 5px 5px 6px rgb(0, 0, 0);
+  font-size: 4vh;
+  margin-top: auto;
 }
