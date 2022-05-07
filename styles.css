@@ -1,11 +1,5 @@
 body {
-  background-color: rgb(56, 56, 56);
-}
-
-#test {
-  display: flex;
-  justify-content: center;
-  align-content: center;
+  background-color: rgb(44, 44, 44);
 }
 
 #game-title {
@@ -17,23 +11,26 @@ body {
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
 }
 
-#canvas {
-  margin: auto;
-  background-color: rgb(73, 73, 73);
-}
-
 #gamefield {
-  height: 1024;
-  width: 1024;
+  display: flex;
+  position: relative;
+  top: 5vh;
+  height: 80vh;
+  width: 80vh;
   box-shadow: 4px 4px 24px 5px rgb(102, 148, 101);
   margin: auto;
 }
 
 #game-info {
-  position: absolute;
-  font-size: 100;
+  display: flex;
+  position: relative;
+  height: 10vh;
+  width: 40vh;
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
-  top: 0;
+  font-size: 5vh;
+  color: white;
+  text-shadow: 5px 3px 10px rgb(102, 148, 101);
+  background-color: red;
 }
 
 #SNAKE {

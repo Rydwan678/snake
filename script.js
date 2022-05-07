@@ -54,6 +54,7 @@ let snake = [
   [0, 0],
 ];
 
+let autoMove;
 let snakeSpeed = 250;
 let apple = [];
 let score = 0;
@@ -92,6 +93,7 @@ const changeWay = (e) => {
 const checkGameLevel = () => {
   if (score == 10) {
     score = 0;
+    counter = 0;
     snake = [
       [192, 0],
       [128, 0],
@@ -100,11 +102,11 @@ const checkGameLevel = () => {
     ];
     direction = "right";
     currentLevel += 1;
-    snakeSpeed -= 100;
+    snakeSpeed -= 12;
     clearInterval(play);
-    setInterval(moveSnake, snakeSpeed);
+    setAutoMove();
+    // setAutoMove();
     chooseSnakeElement();
-    setBricks();
     // drawBricks()
     return true;
   } else {
@@ -133,13 +135,13 @@ const moveSnake = () => {
     snake.unshift([previousElementX, previousElementY]);
     snake[0][1] += 64;
   }
-  if (checkCollision() == true) {
-    console.log("collision true");
-    gameLose();
-  } else if (checkGameLevel() == true) {
+  if (checkGameLevel() == true) {
     console.log("nowylevel");
     levelCounter.textContent = `Level: ${currentLevel}`;
     scoreCounter.textContent = `Points: ${score}`;
+  } else if (checkCollision() == true) {
+    console.log("collision true");
+    gameLose();
   } else {
     chooseSnakeElement();
     drawBricks();
@@ -148,14 +150,18 @@ const moveSnake = () => {
   checkScore();
 };
 
-const play = setInterval(moveSnake, snakeSpeed);
-
 const checkScore = () => {
   if (snake[0][0] == apple[0] && snake[0][1] == apple[1]) {
     score += 5;
     scoreCounter.textContent = `Points: ${score}`;
     eatSound.play();
-    setApple();
+    if (score == 10) {
+      setBricks();
+      setApple();
+    } else {
+      setApple();
+    }
+
     let lastElementX = snake[snake.length - 1][0];
     let lastElementY = snake[snake.length - 1][1];
     snake.push([lastElementX, lastElementY]);
@@ -165,10 +171,11 @@ const checkScore = () => {
 const checkCollision = () => {
   // counter is for disabling collison with bricks for first 3 moves in new round to avoid losing instantly
   counter += 1;
+  console.log(counter);
   let snakeHeadPositionX = snake[0][0];
   let snakeHeadPositionY = snake[0][1];
   // check if snake collided with brick
-  if (counter > 3) {
+  if (counter > 8) {
     for (let i = 0; i < bricks.length; i++) {
       let brickPositionX = bricks[i][0];
       let brickPositionY = bricks[i][1];
@@ -330,8 +337,11 @@ const chooseSnakeElement = () => {
   }
 };
 
-const winPopup = () => {};
+const setAutoMove = () => {
+  play = setInterval(moveSnake, snakeSpeed);
+};
 
 document.addEventListener("keydown", changeWay);
 window.addEventListener("load", setApple);
 window.addEventListener("load", chooseSnakeElement);
+window.addEventListener("load", setAutoMove);
