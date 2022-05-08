@@ -2,6 +2,9 @@ body {
   /* background-color: rgb(44, 44, 44); */
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   background: linear-gradient(rgb(36, 36, 36), rgb(20, 9, 16));
+  display: flex;
+  justify-content: center;
+  align-content: center;
 }
 
 .blur {
@@ -73,7 +76,7 @@ body {
   text-transform: lowercase;
 }
 
-#start-button {
+.button {
   position: absolute;
   left: 0;
   right: 0;
@@ -83,14 +86,46 @@ body {
   height: 6vh;
   width: 25vh;
   border-radius: 50px;
-  border-color: rgb(102, 148, 101);
+  border-color: rgb(255, 255, 255);
+  box-shadow: 1px 3px 10px rgb(236, 236, 236);
   border-style: solid;
   justify-content: center;
 }
 
-#start {
+#button-text {
   color: rgb(255, 255, 255);
   text-shadow: 5px 5px 6px rgb(0, 0, 0);
   font-size: 4vh;
   margin-top: auto;
+}
+
+#popup {
+  display: flex;
+  position: absolute;
+  max-width: 80vh;
+  height: 50vh;
+  align-self: center;
+  top: 12%;
+  z-index: 999;
+}
+
+#popup-text {
+  font-size: 13vh;
+  color: white;
+}
+
+#popup-button {
+  top: 40vh;
+}
+
+.win {
+  text-shadow: 8px 8px 20px rgb(81, 155, 80);
+}
+
+.lose {
+  text-shadow: 8px 8px 20px rgb(201, 3, 3);
+}
+
+.next-level {
+  text-shadow: 8px 8px 20px rgb(255, 255, 255);
 }

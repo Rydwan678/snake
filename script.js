@@ -17,6 +17,10 @@ const gameScreen = document.querySelector("#main-screen");
 const gameInfo = document.querySelector("#game-info");
 const startScreen = document.querySelector("#start-screen");
 const startButton = document.querySelector("#start-button");
+const popup = document.querySelector("#popup");
+const popupText = document.querySelector("#popup-text");
+const popupButton = document.querySelector("#popup-button");
+const popupButtonText = document.querySelector("#button-text");
 
 const countDownNumber = document.querySelector("#number");
 const scoreCounter = document.querySelector("#score");
@@ -59,12 +63,12 @@ let snake = [
   [64, 0],
   [0, 0],
 ];
-
+// gameStatus - win, lose, nextLevel
+let gameStatus;
 let autoMove;
 let snakeSpeed = 250;
 let apple = [];
 let score = 0;
-let lose = false;
 let counter = 0;
 
 let currentLevel = 1;
@@ -97,26 +101,13 @@ const changeWay = (e) => {
 };
 
 const checkGameLevel = () => {
-  if (score == 10) {
-    score = 0;
-    counter = 0;
-    snake = [
-      [192, 0],
-      [128, 0],
-      [64, 0],
-      [0, 0],
-    ];
-    direction = "right";
+  if (score == 10 && currentLevel == 10) {
+    showPopup("win");
+  } else if (score == 10) {
     currentLevel += 1;
     snakeSpeed -= 12;
-    clearInterval(autoMove);
-    setAutoMove();
-    // setAutoMove();
-    chooseSnakeElement();
-    // drawBricks()
+    showPopup("nextLevel");
     return true;
-  } else {
-    return false;
   }
 };
 
@@ -147,7 +138,7 @@ const moveSnake = () => {
     scoreCounter.textContent = `Points: ${score}`;
   } else if (checkCollision() == true) {
     console.log("collision true");
-    gameLose();
+    showPopup("lose");
   } else {
     chooseSnakeElement();
     drawBricks();
@@ -215,9 +206,24 @@ const checkCollision = () => {
   }
 };
 
-const gameLose = () => {
-  clearInterval(autoMove);
-  console.log("przegrales");
+const showPopup = (status) => {
+  if (status == "lose") {
+    clearInterval(autoMove);
+    popup.classList.remove("hide");
+    popupText.textContent = "YOU LOST";
+    popupText.classList.add("lose");
+  } else if (status == "win") {
+    clearInterval(autoMove);
+    popup.classList.remove("hide");
+    popupText.textContent = "YOU WON";
+    popupText.classList.add("win");
+  } else if (status == "nextLevel") {
+    clearInterval(autoMove);
+    popup.classList.remove("hide");
+    popupText.textContent = "LEVEL COMPLETED";
+    popupText.classList.add("next-level");
+    popupButtonText.textContent = "NEXT";
+  }
 };
 
 const getRandomPosition = () => {
@@ -348,8 +354,30 @@ const setAutoMove = () => {
 };
 
 const startGame = () => {
+  popup.classList.add("hide");
+
+  snake = [
+    [192, 0],
+    [128, 0],
+    [64, 0],
+    [0, 0],
+  ];
+  direction = "right";
+  score = 0;
+  counter = 0;
+  setApple();
+  chooseSnakeElement();
+  drawBricks();
+  if (gameStatus == "win" && gameStatus == "lose") {
+    bricks = [];
+    snakeSpeed = 250;
+    currentLevel = 1;
+  }
+
   startScreen.classList.add("hide");
   gameScreen.classList.remove("hide");
+  gameScreen.classList.add("blur");
+
   setTimeout(setAutoMove, 4000);
   setTimeout(() => {
     countDownNumber.textContent = "READY";
@@ -358,7 +386,7 @@ const startGame = () => {
       setTimeout(() => {
         countDownNumber.textContent = "GO!";
         setTimeout(() => {
-          countDownNumber.classList.add("hide");
+          countDownNumber.textContent = "";
           gameInfo.classList.remove("hide");
           gameScreen.classList.remove("blur");
           gameScreen.classList.remove("hide");
@@ -367,7 +395,8 @@ const startGame = () => {
     }, 1000);
   }, 1000);
 };
+
+popupButton.addEventListener("click", startGame);
 startButton.addEventListener("click", startGame);
 document.addEventListener("keydown", changeWay);
-window.addEventListener("load", setApple);
 window.addEventListener("load", chooseSnakeElement);
