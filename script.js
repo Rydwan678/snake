@@ -135,8 +135,8 @@ const moveSnake = () => {
   }
   if (checkGameLevel() == true) {
     console.log("nowylevel");
-    levelCounter.textContent = `Level: ${currentLevel}`;
-    scoreCounter.textContent = `Points: ${score}`;
+    levelCounter.textContent = currentLevel;
+    scoreCounter.textContent = score;
   } else if (checkCollision() == true) {
     console.log("collision true");
     showPopup("lose");
@@ -150,7 +150,7 @@ const moveSnake = () => {
 const checkScore = () => {
   if (snake[0][0] == apple[0] && snake[0][1] == apple[1]) {
     score += 1;
-    scoreCounter.textContent = `Points: ${score}`;
+    scoreCounter.textContent = score;
     eatSound.play();
     if (score == 10) {
       setBricks();
