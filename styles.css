@@ -50,6 +50,15 @@ body {
   border-radius: 30px;
 }
 
+#game-info {
+  position: relative;
+  color: white;
+  text-shadow: 5px 3px 10px rgb(102, 148, 101);
+  font-size: 5vh;
+  bottom: 60vh;
+  right: 25vh;
+}
+
 #start-screen {
   position: absolute;
   text-align: center;
