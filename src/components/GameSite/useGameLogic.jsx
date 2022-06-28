@@ -27,6 +27,10 @@ export default function useGame() {
     score: 0,
     level: 1,
     isRunning: true,
+    popup: {
+      isShown: false,
+      type: "",
+    },
   });
 
   const eatSound = new Audio("sounds/eatsound.mp3");
@@ -36,7 +40,7 @@ export default function useGame() {
     setBricks();
   }, []);
 
-  function changeDirection(e) {
+  function handleKeyDown(e) {
     const direction = gameDataRef.current.direction;
     if (e.key === "w") {
       if (direction !== "down") {
@@ -54,6 +58,14 @@ export default function useGame() {
       if (direction !== "left") {
         gameDataRef.current.direction = "right";
       }
+    }
+
+    if (e.key === "Escape") {
+      gameDataRef.current.isRunning = !gameDataRef.current.isRunning;
+      gameDataRef.current.popup = {
+        isShown: !gameDataRef.current.popup.isShown,
+        type: "gamePaused",
+      };
     }
   }
 
@@ -86,7 +98,10 @@ export default function useGame() {
       gameDataRef.current.snakePosition = updatedSnakePosition;
     } else if (checkCollision(updatedSnakePosition) === true) {
       gameDataRef.current.isRunning = false;
-      console.log("you lost");
+      gameDataRef.current.popup = {
+        isShown: !gameDataRef.current.popup.isShown,
+        type: "lose",
+      };
     }
     checkScore();
   };
@@ -197,14 +212,26 @@ export default function useGame() {
       }
     }
     // if apple has been spawned in blind alley, create new position
-    // const topField = [apple[0], apple[1] - 64];
-    // const bottomField = [apple[0], apple[1] + 64];
-    // const leftField = [apple[0] - 64, apple[1]];
-    // const rightField = [apple[0] + 64, apple[1]];
-    // console.log();
-    // for (let i = 0; i < bricksPosition.length; i++) {
-    //   if (bricksPosition[i][0] ===)
-    // }
+    const appleAdjacentFields = [
+      [apple[0], apple[1] - 64],
+      [apple[0], apple[1] + 64],
+      [apple[0] - 64, apple[1]],
+      [apple[0] + 64, apple[1]],
+    ];
+    let counter = 0;
+    for (let i = 0; i < bricksPosition.length; i++) {
+      for (let x = 0; x < appleAdjacentFields.length; x++) {
+        if (
+          bricksPosition[i][0] === appleAdjacentFields[x][0] &&
+          bricksPosition[i][1] === appleAdjacentFields[x][1]
+        ) {
+          counter += 1;
+        }
+      }
+      if (counter === 3) {
+        setApple();
+      }
+    }
   };
 
   const checkScore = () => {
@@ -261,13 +288,15 @@ export default function useGame() {
   };
 
   function update() {
-    moveSnake();
-    checkScore();
+    if (gameDataRef.current.isRunning) {
+      moveSnake();
+      checkScore();
+    }
   }
 
   return {
     gameDataRef,
-    changeDirection,
+    handleKeyDown,
     update,
   };
 }

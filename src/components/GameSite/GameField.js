@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import useGameLogic from "./useGameLogic";
 import useGame from "./useGame";
+import Popup from "./Popup";
 
 export default function GameField() {
   const snakeIcon = new Image();
@@ -12,20 +13,27 @@ export default function GameField() {
 
   const canvasRef = useRef(null);
 
-  const { gameDataRef, changeDirection } = useGame(render);
+  const { gameDataRef, handleKeyDown } = useGame(render);
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(gameDataRef.current.level);
   const [isRunning, setIsRunning] = useState(gameDataRef.current.isRunning);
+  const [popup, setPopup] = useState({
+    isShown: false,
+    type: "",
+  });
 
   useEffect(() => {
     setScore(gameDataRef.current.score);
     setIsRunning(gameDataRef.current.isRunning);
     setLevel(gameDataRef.current.level);
+    setPopup({ ...gameDataRef.current.popup });
+    console.log(gameDataRef.current.popup);
   }, [
     gameDataRef.current.snakePosition,
     gameDataRef.current.score,
     gameDataRef.current.isRunning,
     gameDataRef.current.level,
+    gameDataRef.current.popup,
   ]);
 
   useEffect(() => {
@@ -157,16 +165,20 @@ export default function GameField() {
   };
 
   return (
-    <div
-      className="game-field"
-      onKeyDown={isRunning ? changeDirection : () => {}}
-      tabIndex={0}
-    >
-      <div className="column-container">
-        <h1>Wynik: {score}</h1>
-        <h1>Level: {level}</h1>
+    <div className="game-field">
+      {popup.isShown && <Popup type={popup.type} />}
+      <div className="game-info">
+        <img src="textures/apple.png" className="apple-icon"></img>
+        <h1>{score}</h1>
+        <img
+          src="https://cdn3.iconfinder.com/data/icons/game-competition-flat/64/15_Top_Player_game_competition-512.png"
+          className="level-icon"
+        ></img>
+        <h1>{level}</h1>
       </div>
-      <canvas ref={canvasRef}></canvas>
+      <div className="canvas-field" onKeyDown={handleKeyDown} tabIndex={0}>
+        <canvas ref={canvasRef}></canvas>
+      </div>
     </div>
   );
 }

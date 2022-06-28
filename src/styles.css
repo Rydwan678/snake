@@ -4,10 +4,14 @@ body * {
 }
 
 body {
+  height: 100vh;
   display: flex;
   justify-content: center;
   background-image: url("../public/textures/background.jpg");
   font-family: Ubuntu;
+  color: rgb(255, 255, 255);
+  margin: 0%;
+  padding: 0%;
 }
 
 main {
@@ -21,8 +25,10 @@ main {
 .game-title {
   position: absolute;
   top: 0;
-  color: rgb(34, 34, 34);
+  color: rgb(255, 255, 255);
+  text-shadow: 4px 8px 20px rgb(122, 192, 122);
   font-size: 5rem;
+  margin-top: 15px;
 }
 
 button {
@@ -32,7 +38,10 @@ button {
   width: 15rem;
   border-radius: 15px;
   border: 2px solid rgb(199, 199, 199);
-  background-color: rgb(238, 233, 221, 0.5);
+  background: linear-gradient(90deg, #9ebd13 0%, #008552 100%);
+  font-weight: 700;
+  color: rgb(255, 255, 255);
+  text-shadow: 2px 1px 5px rgb(255, 255, 255);
 }
 
 button > p {
@@ -50,16 +59,23 @@ button > p {
 canvas {
   background-color: rgb(128, 128, 128, 0.3);
   border: 2px solid rgb(177, 177, 177, 0.8);
+  border-radius: 35px;
+  max-height: 80vh;
+}
+
+.canvas-field {
+  outline: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .game-field {
-  outline: none;
-}
-
-.column-container {
-  position: absolute;
+  height: 100vh;
+  width: 100vw;
   display: flex;
-  flex-flow: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .option-container {
@@ -71,4 +87,41 @@ canvas {
   margin-left: 20px;
   width: 8rem;
   height: 2rem;
+}
+
+.game-info {
+  position: absolute;
+  top: 50px;
+  display: flex;
+  font-size: 1.2rem;
+}
+
+.apple-icon,
+.level-icon {
+  height: 3rem;
+  margin-left: 30px;
+  text-shadow: 2px 1px 5px rgb(255, 255, 255);
+}
+
+.popup-body {
+  position: absolute;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(75, 75, 75, 0.5);
+}
+
+.popup {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 4px solid green;
+  background-color: rgb(44, 112, 42);
+  border-radius: 20px;
+  height: 200px;
+  width: 450px;
+  font-size: 4rem;
 }
