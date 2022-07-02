@@ -11,7 +11,7 @@ export default function StartSite(props) {
 
   const [settings, setSettings] = useState({
     audio: true,
-    difficulty: "easy",
+    difficulty: "EASY",
   });
 
   function changeSite(e) {
@@ -25,7 +25,7 @@ export default function StartSite(props) {
   }
 
   function changeDifficulty() {
-    const levels = ["easy", "normal", "hard"];
+    const levels = ["EASY", "NORMAL", "HARD"];
     const currentLevel = levels.findIndex(
       (element) => element === settings.difficulty
     );

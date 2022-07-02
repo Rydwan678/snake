@@ -12,7 +12,7 @@ export default function App() {
   return (
     <div>
       {isStartSite && <StartSite changePage={changePage} />}
-      {!isStartSite && <GameSite />}
+      {!isStartSite && <GameSite changePage={changePage} />}
     </div>
   );
 }

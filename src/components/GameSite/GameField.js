@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import useGameLogic from "./useGameLogic";
 import useGame from "./useGame";
 import Popup from "./Popup";
+import CountingDown from "./CountingDown";
 
-export default function GameField() {
+export default function GameField(props) {
   const snakeIcon = new Image();
   snakeIcon.src = "textures/snakegraphics.png";
   const appleIcon = new Image();
@@ -12,8 +13,16 @@ export default function GameField() {
   brickIcon.src = "textures/brick.png";
 
   const canvasRef = useRef(null);
+  const focusRef = useRef();
 
-  const { gameDataRef, handleKeyDown } = useGame(render);
+  const {
+    gameDataRef,
+    handleKeyDown,
+    startGame,
+    setRunning,
+    disableCounting,
+    setNewLevel,
+  } = useGame(render);
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(gameDataRef.current.level);
   const [isRunning, setIsRunning] = useState(gameDataRef.current.isRunning);
@@ -21,24 +30,23 @@ export default function GameField() {
     isShown: false,
     type: "",
   });
+  const [isCounting, setIsCounting] = useState(true);
 
   useEffect(() => {
     setScore(gameDataRef.current.score);
     setIsRunning(gameDataRef.current.isRunning);
     setLevel(gameDataRef.current.level);
     setPopup({ ...gameDataRef.current.popup });
-    console.log(gameDataRef.current.popup);
+    setIsCounting(gameDataRef.current.isCounting);
+    focusRef.current.focus();
   }, [
     gameDataRef.current.snakePosition,
     gameDataRef.current.score,
     gameDataRef.current.isRunning,
     gameDataRef.current.level,
     gameDataRef.current.popup,
+    gameDataRef.current.isCounting,
   ]);
-
-  useEffect(() => {
-    console.log("isrunning", isRunning);
-  }, [isRunning]);
 
   function render() {
     const canvas = canvasRef.current;
@@ -165,8 +173,28 @@ export default function GameField() {
   };
 
   return (
-    <div className="game-field">
-      {popup.isShown && <Popup type={popup.type} />}
+    <div
+      className="game-field"
+      tabIndex={1}
+      ref={focusRef}
+      onKeyDown={isRunning ? handleKeyDown : () => {}}
+    >
+      {isCounting && (
+        <CountingDown
+          setRunning={setRunning}
+          disableCounting={disableCounting}
+        />
+      )}
+      {popup.isShown && (
+        <Popup
+          type={popup.type}
+          level={level}
+          changePage={props.changePage}
+          startGame={startGame}
+          setNewLevel={setNewLevel}
+          handleKeyDown={handleKeyDown}
+        />
+      )}
       <div className="game-info">
         <img src="textures/apple.png" className="apple-icon"></img>
         <h1>{score}</h1>
@@ -176,7 +204,7 @@ export default function GameField() {
         ></img>
         <h1>{level}</h1>
       </div>
-      <div className="canvas-field" onKeyDown={handleKeyDown} tabIndex={0}>
+      <div className="canvas-field" tabIndex={0}>
         <canvas ref={canvasRef}></canvas>
       </div>
     </div>

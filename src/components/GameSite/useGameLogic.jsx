@@ -1,18 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
+import CountingDown from "./CountingDown";
 
 export default function useGame() {
-  // const [snakePosition, setSnakePosition] = useState([
-  //   [192, 0],
-  //   [128, 0],
-  //   [64, 0],
-  //   [0, 0],
-  // ]);
-  // const [direction, setDirection] = useState("right");
-
-  useEffect(() => {
-    console.log("rendered");
-  }, []);
-
   const gameDataRef = useRef({
     snakePosition: [
       [192, 0],
@@ -26,11 +15,12 @@ export default function useGame() {
     bricksPosition: [],
     score: 0,
     level: 1,
-    isRunning: true,
+    isRunning: false,
     popup: {
       isShown: false,
       type: "",
     },
+    isCounting: true,
   });
 
   const eatSound = new Audio("sounds/eatsound.mp3");
@@ -61,6 +51,7 @@ export default function useGame() {
     }
 
     if (e.key === "Escape") {
+      console.log("test");
       gameDataRef.current.isRunning = !gameDataRef.current.isRunning;
       gameDataRef.current.popup = {
         isShown: !gameDataRef.current.popup.isShown,
@@ -75,7 +66,9 @@ export default function useGame() {
     // delete last part of snake and add new with updated position
     let previousElementX = snakePosition[0][0];
     let previousElementY = snakePosition[0][1];
+    let lastSnakeElement = snakePosition[snakePosition.length - 1];
     let updatedSnakePosition = [...snakePosition];
+
     if (direction === "right") {
       updatedSnakePosition.pop();
       updatedSnakePosition.unshift([previousElementX, previousElementY]);
@@ -103,37 +96,46 @@ export default function useGame() {
         type: "lose",
       };
     }
-    checkScore();
+    checkScore(lastSnakeElement);
   };
 
-  // const moveSnake = () => {
-  //   const snakePosition = gameDataRef.current.snakePosition;
-  //   const direction = gameDataRef.current.direction;
-  //   // delete last part of snake and add new with updated position
-  //   let previousElementX = snakePosition[0][0];
-  //   let previousElementY = snakePosition[0][1];
-  //   let updatedSnakePosition = [...snakePosition];
-  //   if (direction === "right") {
-  //     updatedSnakePosition.pop();
-  //     updatedSnakePosition.unshift([previousElementX, previousElementY]);
-  //     updatedSnakePosition[0][0] += 64;
-  //   } else if (direction === "left") {
-  //     updatedSnakePosition.pop();
-  //     updatedSnakePosition.unshift([previousElementX, previousElementY]);
-  //     updatedSnakePosition[0][0] -= 64;
-  //   } else if (direction === "up") {
-  //     updatedSnakePosition.pop();
-  //     updatedSnakePosition.unshift([previousElementX, previousElementY]);
-  //     updatedSnakePosition[0][1] -= 64;
-  //   } else if (direction === "down") {
-  //     updatedSnakePosition.pop();
-  //     updatedSnakePosition.unshift([previousElementX, previousElementY]);
-  //     updatedSnakePosition[0][1] += 64;
-  //   }
+  const checkScore = (lastSnakeElement) => {
+    const snakePosition = gameDataRef.current.snakePosition;
+    const applePosition = gameDataRef.current.applePosition;
+    const score = gameDataRef.current.score;
+    if (
+      snakePosition[0][0] === applePosition[0] &&
+      snakePosition[0][1] === applePosition[1]
+    ) {
+      eatSound.play();
+      if (score + 1 !== 10 && gameDataRef.current.level !== 10) {
+        console.log("punkt");
+        gameDataRef.current.score = score + 1;
 
-  //   gameDataRef.current.snakePosition = updatedSnakePosition;
-  //   checkScore();
-  // };
+        gameDataRef.current.snakePosition.push(lastSnakeElement);
+        setApple();
+      } else if (score + 1 === 10) {
+        if (gameDataRef.current.level < 9) {
+          gameDataRef.current.isRunning = false;
+          gameDataRef.current.popup = {
+            isShown: !gameDataRef.current.popup.isShown,
+            type: "nextLevel",
+          };
+        } else if (gameDataRef.current.level === 9) {
+          gameDataRef.current.level = 10;
+          gameDataRef.current.score = 0;
+          gameDataRef.current.isRunning = false;
+          gameDataRef.current.popup = {
+            isShown: !gameDataRef.current.popup.isShown,
+            type: "win",
+          };
+        }
+      }
+      return true;
+    } else {
+      return false;
+    }
+  };
 
   const checkCollision = (data) => {
     const snakePosition = data;
@@ -234,29 +236,6 @@ export default function useGame() {
     }
   };
 
-  const checkScore = () => {
-    const snakePosition = gameDataRef.current.snakePosition;
-    const applePosition = gameDataRef.current.applePosition;
-    const score = gameDataRef.current.score;
-    if (
-      snakePosition[0][0] === applePosition[0] &&
-      snakePosition[0][1] === applePosition[1]
-    ) {
-      eatSound.play();
-      if (score + 5 > 9) {
-        setNewLevel();
-      } else if (score < 9) {
-        gameDataRef.current.score = score + 5;
-
-        let lastElementX = snakePosition[snakePosition.length - 1][0];
-        let lastElementY = snakePosition[snakePosition.length - 1][1];
-        snakePosition.push([lastElementX, lastElementY]);
-
-        setApple();
-      }
-    }
-  };
-
   const setBricks = () => {
     const bricksPosition = gameDataRef.current.bricksPosition;
     for (let i = 0; i < 5; i++) {
@@ -272,20 +251,60 @@ export default function useGame() {
   };
 
   const setNewLevel = () => {
-    gameDataRef.current.snakePosition = [
-      [192, 0],
-      [128, 0],
-      [64, 0],
-      [0, 0],
-    ];
-    gameDataRef.current.direction = "right";
-    gameDataRef.current.speed -= 12;
+    gameDataRef.current.level += 1;
     gameDataRef.current.score = 0;
-    gameDataRef.current.level = gameDataRef.current.level += 1;
+    if (gameDataRef.current.level !== 10) {
+      gameDataRef.current.snakePosition = [
+        [192, 0],
+        [128, 0],
+        [64, 0],
+        [0, 0],
+      ];
+      gameDataRef.current.direction = "right";
+      gameDataRef.current.speed -= 12;
+      gameDataRef.current.popup = {
+        isShown: false,
+        type: "",
+      };
 
+      setBricks();
+      setApple();
+      gameDataRef.current.isCounting = true;
+    }
+  };
+
+  function startGame() {
+    gameDataRef.current = {
+      snakePosition: [
+        [192, 0],
+        [128, 0],
+        [64, 0],
+        [0, 0],
+      ],
+      direction: "right",
+      speed: 250,
+      applePosition: [],
+      bricksPosition: [],
+      score: 0,
+      level: 1,
+      isRunning: false,
+      popup: {
+        isShown: false,
+        type: "",
+      },
+    };
     setBricks();
     setApple();
-  };
+    gameDataRef.current.isCounting = true;
+  }
+
+  function setRunning() {
+    gameDataRef.current.isRunning = true;
+  }
+
+  function disableCounting() {
+    gameDataRef.current.isCounting = false;
+  }
 
   function update() {
     if (gameDataRef.current.isRunning) {
@@ -298,5 +317,9 @@ export default function useGame() {
     gameDataRef,
     handleKeyDown,
     update,
+    startGame,
+    setNewLevel,
+    setRunning,
+    disableCounting,
   };
 }
