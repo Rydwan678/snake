@@ -1,10 +1,14 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useRef } from "react";
-import useGameLogic from "./useGameLogic";
 import useGame from "./useGame";
 import Popup from "./Popup";
 import CountingDown from "./CountingDown";
 
-export default function GameField(props) {
+interface GameFieldProps {
+  changePage: () => void;
+}
+
+export default function GameField(props: GameFieldProps) {
   const snakeIcon = new Image();
   snakeIcon.src = "textures/snakegraphics.png";
   const appleIcon = new Image();
@@ -12,8 +16,8 @@ export default function GameField(props) {
   const brickIcon = new Image();
   brickIcon.src = "textures/brick.png";
 
-  const canvasRef = useRef(null);
-  const focusRef = useRef();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const focusRef = useRef<HTMLInputElement>(null);
 
   const {
     gameDataRef,
@@ -38,7 +42,7 @@ export default function GameField(props) {
     setLevel(gameDataRef.current.level);
     setPopup({ ...gameDataRef.current.popup });
     setIsCounting(gameDataRef.current.isCounting);
-    focusRef.current.focus();
+    focusRef.current!.focus();
   }, [
     gameDataRef.current.snakePosition,
     gameDataRef.current.score,
@@ -49,13 +53,16 @@ export default function GameField(props) {
   ]);
 
   function render() {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    canvas.width = "1024";
-    canvas.height = "1024";
+    const canvas: HTMLCanvasElement = canvasRef.current!;
+    const ctx: any = canvas.getContext("2d");
+    canvas.width = 1024;
+    canvas.height = 1024;
 
-    const drawSnakeElements = (element, position) => {
-      let choosedElement = IMAGES[element];
+    const drawSnakeElements = (
+      element: [string, number[] | (number | null)[]],
+      position: number[]
+    ) => {
+      let choosedElement = element[1];
       let elementPosition = position;
       ctx.drawImage(
         snakeIcon,
@@ -89,43 +96,43 @@ export default function GameField(props) {
         let nextElement = snakePosition[i - 1];
         let previousElement = snakePosition[i + 1];
         // head
-        if (nextElement == undefined) {
-          for (let image in IMAGES) {
+        if (nextElement === undefined) {
+          for (const [key, value] of Object.entries(IMAGES)) {
             if (
-              previousElement[0] - currentElement[0] === IMAGES[image][2] &&
-              previousElement[1] - currentElement[1] === IMAGES[image][3]
+              previousElement[0] - currentElement[0] === value[2] &&
+              previousElement[1] - currentElement[1] === value[3]
             ) {
-              drawSnakeElements(image, snakePosition[i]);
+              drawSnakeElements([key, value], snakePosition[i]);
               break;
             }
           }
         }
         // tail
-        else if (previousElement == undefined) {
-          for (let image in IMAGES) {
+        else if (previousElement === undefined) {
+          for (const [key, value] of Object.entries(IMAGES)) {
             if (
-              nextElement[0] - currentElement[0] === IMAGES[image][4] &&
-              nextElement[1] - currentElement[1] === IMAGES[image][5]
+              nextElement[0] - currentElement[0] === value[4] &&
+              nextElement[1] - currentElement[1] === value[5]
             ) {
-              drawSnakeElements(image, snakePosition[i]);
+              drawSnakeElements([key, value], snakePosition[i]);
               break;
             }
           }
         }
         // something else
         else if (nextElement && previousElement) {
-          for (let image in IMAGES) {
+          for (const [key, value] of Object.entries(IMAGES)) {
             if (
-              (previousElement[0] - currentElement[0] === IMAGES[image][2] &&
-                previousElement[1] - currentElement[1] === IMAGES[image][3] &&
-                nextElement[0] - currentElement[0] === IMAGES[image][4] &&
-                nextElement[1] - currentElement[1] === IMAGES[image][5]) ||
-              (previousElement[0] - currentElement[0] === IMAGES[image][4] &&
-                previousElement[1] - currentElement[1] === IMAGES[image][5] &&
-                nextElement[0] - currentElement[0] === IMAGES[image][2] &&
-                nextElement[1] - currentElement[1] === IMAGES[image][3])
+              (previousElement[0] - currentElement[0] === value[2] &&
+                previousElement[1] - currentElement[1] === value[3] &&
+                nextElement[0] - currentElement[0] === value[4] &&
+                nextElement[1] - currentElement[1] === value[5]) ||
+              (previousElement[0] - currentElement[0] === value[4] &&
+                previousElement[1] - currentElement[1] === value[5] &&
+                nextElement[0] - currentElement[0] === value[2] &&
+                nextElement[1] - currentElement[1] === value[3])
             ) {
-              drawSnakeElements(image, snakePosition[i]);
+              drawSnakeElements([key, value], snakePosition[i]);
               break;
             }
           }
@@ -196,9 +203,10 @@ export default function GameField(props) {
         />
       )}
       <div className="game-info">
-        <img src="textures/apple.png" className="apple-icon"></img>
+        <img alt="apple" src="textures/apple.png" className="apple-icon"></img>
         <h1>{score}</h1>
         <img
+          alt="level"
           src="https://cdn3.iconfinder.com/data/icons/game-competition-flat/64/15_Top_Player_game_competition-512.png"
           className="level-icon"
         ></img>

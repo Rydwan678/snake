@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 
-export default function CountingDown(props) {
+interface CountingDownProps {
+  setRunning: () => void;
+  disableCounting: () => void;
+}
+
+export default function CountingDown(props: CountingDownProps) {
   const [text, setText] = useState("");
 
   const styles = {};

@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import GameField from "./GameField";
 
-export default function GameSite(props) {
+interface GameSiteProps {
+  changePage: () => void;
+}
+
+export default function GameSite(props: GameSiteProps) {
   return (
     <main className="game-site">
       <h1 className="game-title">SNAKE</h1>

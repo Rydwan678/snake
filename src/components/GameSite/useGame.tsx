@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useRef } from "react";
 import useGameLogic from "./useGameLogic";
 
-export default function useGame(render) {
-  const requestID = useRef(null);
-  const previousTime = useRef(null);
+export default function useGame(render: () => void) {
+  const requestID = useRef<number | null>(null);
+  const previousTime = useRef<number | null>(null);
 
   const gameLogic = useGameLogic();
 
@@ -11,8 +13,7 @@ export default function useGame(render) {
 
   const newFrameRef = useRef(-1);
 
-  function loop(time) {
-    const deltaTime = time - previousTime.current;
+  function loop(time: number) {
     const speed = gameData.speed;
     if (time > newFrameRef.current) {
       newFrameRef.current = time + speed;
@@ -22,7 +23,7 @@ export default function useGame(render) {
     setGameData({ ...gameLogic.gameDataRef.current });
     previousTime.current = time;
 
-    requestID.current = requestAnimationFrame(loop);
+    requestID.current! = requestAnimationFrame(loop);
   }
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export default function useGame(render) {
 
     requestID.current = requestAnimationFrame(loop);
 
-    return () => cancelAnimationFrame(requestID.current);
+    return () => cancelAnimationFrame(requestID.current!);
   }, []);
   return { ...gameLogic, gameData };
 }

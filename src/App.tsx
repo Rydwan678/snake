@@ -3,7 +3,7 @@ import StartSite from "./components/StartSite";
 import GameSite from "./components/GameSite";
 
 export default function App() {
-  const [isStartSite, setIsStartSite] = useState(true);
+  const [isStartSite, setIsStartSite] = useState<boolean>(true);
 
   function changePage() {
     setIsStartSite((previousPage) => !previousPage);

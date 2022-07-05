@@ -1,7 +1,24 @@
 import React, { useEffect, useRef } from "react";
 
-export default function Popup(props) {
-  const styles = {};
+interface PopupProps {
+  type: string;
+  level: number;
+  changePage: () => void;
+  startGame: () => void;
+  setNewLevel: () => void;
+  handleKeyDown: (e: React.KeyboardEvent) => void;
+}
+
+export default function Popup(props: PopupProps) {
+  type Styles = {
+    background: string;
+    boxShadow: string;
+  };
+
+  const styles: Styles = {
+    background: "",
+    boxShadow: "",
+  };
   if (props.type === "win") {
     styles.background = "linear-gradient(90deg, #fcff9e 0%, #c67700 100%)";
     styles.boxShadow = "4px 4px 15px #ff9900";
@@ -20,10 +37,10 @@ export default function Popup(props) {
     styles.boxShadow = "1px 1px 15px  #1CB5E0";
   }
 
-  const focusRef = useRef();
+  const focusRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    focusRef.current.focus();
+    focusRef.current && focusRef.current.focus();
   }, []);
 
   if (props.type === "nextLevel") {
@@ -53,10 +70,12 @@ export default function Popup(props) {
       >
         <div className="popup" style={styles}>
           <p>GAME PAUSED</p>
+
           <div>
             <button style={styles} onClick={props.startGame}>
               RESTART
             </button>
+
             <button style={styles} onClick={props.changePage}>
               BACK TO MENU
             </button>
@@ -64,15 +83,18 @@ export default function Popup(props) {
         </div>
       </div>
     );
+
   if (props.type === "lose")
     return (
       <div className="popup-body" ref={focusRef} tabIndex={1}>
         <div className="popup" style={styles}>
           <p>YOU LOST</p>
+
           <div>
             <button style={styles} onClick={props.startGame}>
               PLAY AGAIN
             </button>
+
             <button style={styles} onClick={props.changePage}>
               BACK TO MENU
             </button>
@@ -80,15 +102,18 @@ export default function Popup(props) {
         </div>
       </div>
     );
+
   if (props.type === "win") {
     return (
       <div className="popup-body" ref={focusRef} tabIndex={1}>
         <div className="popup" style={styles}>
           <p>YOU WON</p>
+
           <div>
             <button style={styles} onClick={props.startGame}>
               PLAY AGAIN
             </button>
+
             <button style={styles} onClick={props.changePage}>
               BACK TO MENU
             </button>
@@ -97,4 +122,5 @@ export default function Popup(props) {
       </div>
     );
   }
+  return null;
 }

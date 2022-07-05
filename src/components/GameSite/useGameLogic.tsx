@@ -2,7 +2,23 @@ import React, { useState, useEffect, useRef } from "react";
 import CountingDown from "./CountingDown";
 
 export default function useGame() {
-  const gameDataRef = useRef({
+  interface GameDataTypes {
+    snakePosition: number[][];
+    direction: string;
+    speed: number;
+    applePosition: number[];
+    bricksPosition: number[][];
+    score: number;
+    level: number;
+    isRunning: boolean;
+    popup: {
+      isShown: boolean;
+      type: string;
+    };
+    isCounting: boolean;
+  }
+
+  const gameDataRef = useRef<GameDataTypes>({
     snakePosition: [
       [192, 0],
       [128, 0],
@@ -30,7 +46,7 @@ export default function useGame() {
     setBricks();
   }, []);
 
-  function handleKeyDown(e) {
+  function handleKeyDown(e: React.KeyboardEvent) {
     const direction = gameDataRef.current.direction;
     if (e.key === "w") {
       if (direction !== "down") {
@@ -99,7 +115,7 @@ export default function useGame() {
     checkScore(lastSnakeElement);
   };
 
-  const checkScore = (lastSnakeElement) => {
+  const checkScore = (lastSnakeElement: number[]) => {
     const snakePosition = gameDataRef.current.snakePosition;
     const applePosition = gameDataRef.current.applePosition;
     const score = gameDataRef.current.score;
@@ -137,7 +153,7 @@ export default function useGame() {
     }
   };
 
-  const checkCollision = (data) => {
+  const checkCollision = (data: number[][]) => {
     const snakePosition = data;
     const bricksPosition = gameDataRef.current.bricksPosition;
     let snakeHeadPositionX = snakePosition[0][0];
@@ -148,8 +164,8 @@ export default function useGame() {
       let brickPositionY = bricksPosition[i][1];
 
       if (
-        snakeHeadPositionX == brickPositionX &&
-        snakeHeadPositionY == brickPositionY
+        snakeHeadPositionX === brickPositionX &&
+        snakeHeadPositionY === brickPositionY
       ) {
         return true;
       }
@@ -196,7 +212,7 @@ export default function useGame() {
     const apple = [positionX, positionY];
     gameDataRef.current.applePosition = apple;
     // if apple has been spawned in player, create new position
-    for (let i = 0; i < snakePosition; i++) {
+    for (let i = 0; i < snakePosition.length; i++) {
       if (
         snakePosition[i][0] === apple[0] &&
         snakePosition[i][1] === apple[1]
@@ -292,10 +308,10 @@ export default function useGame() {
         isShown: false,
         type: "",
       },
+      isCounting: true,
     };
     setBricks();
     setApple();
-    gameDataRef.current.isCounting = true;
   }
 
   function setRunning() {
@@ -309,7 +325,6 @@ export default function useGame() {
   function update() {
     if (gameDataRef.current.isRunning) {
       moveSnake();
-      checkScore();
     }
   }
 

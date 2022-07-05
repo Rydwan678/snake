@@ -1,7 +1,11 @@
 import { getDefaultNormalizer } from "@testing-library/react";
-import React, { useState } from "react";
+import React, { ReducerWithoutAction, useState } from "react";
 
-export default function StartSite(props) {
+interface StartSiteProps {
+  changePage: () => void;
+}
+
+export default function StartSite(props: StartSiteProps) {
   const [currentSite, setCurrentSite] = useState({
     menu: true,
     options: false,
@@ -14,13 +18,13 @@ export default function StartSite(props) {
     difficulty: "EASY",
   });
 
-  function changeSite(e) {
+  function changeSite(e: React.MouseEvent) {
     setCurrentSite((previousCurrentSite) => ({
       menu: false,
       options: false,
       about: false,
       chooseGamemode: false,
-      [e.target.name]: true,
+      [(e.target as HTMLInputElement).name]: true,
     }));
   }
 
@@ -38,10 +42,11 @@ export default function StartSite(props) {
     }));
   }
 
-  function toggleSetting(e) {
+  function toggleSetting(e: React.MouseEvent) {
     setSettings((previousSettings) => ({
       ...previousSettings,
-      [e.target.name]: !previousSettings[e.target.name],
+      [(e.target as HTMLInputElement).name]: !(e.target as HTMLInputElement)
+        .name,
     }));
   }
 
@@ -50,13 +55,13 @@ export default function StartSite(props) {
       <h1 className="game-title">SNAKE</h1>
       {currentSite.menu && (
         <div className="menu">
-          <button onClick={changeSite} name="chooseGamemode">
+          <button onClick={(e) => changeSite(e)} name="chooseGamemode">
             <p>START</p>
           </button>
-          <button onClick={changeSite} name="options">
+          <button onClick={(e) => changeSite(e)} name="options">
             <p>OPTIONS</p>
           </button>
-          <button onClick={changeSite} name="about">
+          <button onClick={(e) => changeSite(e)} name="about">
             <p>ABOUT</p>
           </button>
         </div>
@@ -65,7 +70,7 @@ export default function StartSite(props) {
         <div>
           <div className="option-container">
             <h1>Audio</h1>
-            <button onClick={toggleSetting} name="audio">
+            <button onClick={(e) => toggleSetting(e)} name="audio">
               {settings.audio ? "ON" : "OFF"}
             </button>
           </div>
@@ -73,7 +78,7 @@ export default function StartSite(props) {
             <h1>Difficulty</h1>
             <button onClick={changeDifficulty}>{settings.difficulty}</button>
           </div>
-          <button name="menu" onClick={changeSite}>
+          <button name="menu" onClick={(e) => changeSite(e)}>
             BACK
           </button>
         </div>
@@ -81,7 +86,7 @@ export default function StartSite(props) {
       {currentSite.about && (
         <div>
           <h1>About</h1>
-          <button name="menu" onClick={changeSite}>
+          <button name="menu" onClick={(e) => changeSite(e)}>
             BACK
           </button>
         </div>
