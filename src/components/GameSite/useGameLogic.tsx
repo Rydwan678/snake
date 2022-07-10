@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
-import CountingDown from "./CountingDown";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect, useRef } from "react";
+import { Settings } from "../../types";
 
-export default function useGame() {
+export default function useGameLogic(settings: Settings) {
   interface GameDataTypes {
     snakePosition: number[][];
     direction: string;
@@ -39,11 +40,9 @@ export default function useGame() {
     isCounting: true,
   });
 
-  const eatSound = new Audio("sounds/eatsound.mp3");
-
   useEffect(() => {
     setApple();
-    setBricks();
+    settings.gamemode === "bricksSnake" && setBricks();
   }, []);
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -109,7 +108,7 @@ export default function useGame() {
       gameDataRef.current.isRunning = false;
       gameDataRef.current.popup = {
         isShown: !gameDataRef.current.popup.isShown,
-        type: "lose",
+        type: settings.gamemode === "bricksSnake" ? "lose" : "end",
       };
     }
     checkScore(lastSnakeElement);
@@ -123,14 +122,14 @@ export default function useGame() {
       snakePosition[0][0] === applePosition[0] &&
       snakePosition[0][1] === applePosition[1]
     ) {
-      eatSound.play();
-      if (score + 1 !== 10 && gameDataRef.current.level !== 10) {
-        console.log("punkt");
-        gameDataRef.current.score = score + 1;
+      const eatSound = new Audio("sounds/eatsound.mp3");
+      settings.audio && eatSound.play();
+      gameDataRef.current.score = score + 1;
+      gameDataRef.current.snakePosition.push(lastSnakeElement);
 
-        gameDataRef.current.snakePosition.push(lastSnakeElement);
-        setApple();
-      } else if (score + 1 === 10) {
+      setApple();
+
+      if (settings.gamemode === "bricksSnake" && score + 1 === 10) {
         if (gameDataRef.current.level < 9) {
           gameDataRef.current.isRunning = false;
           gameDataRef.current.popup = {
@@ -167,6 +166,7 @@ export default function useGame() {
         snakeHeadPositionX === brickPositionX &&
         snakeHeadPositionY === brickPositionY
       ) {
+        setBestScore();
         return true;
       }
     }
@@ -178,6 +178,7 @@ export default function useGame() {
         snakePartPositionX === snakeHeadPositionX &&
         snakePartPositionY === snakeHeadPositionY
       ) {
+        setBestScore();
         return true;
       }
     }
@@ -188,6 +189,7 @@ export default function useGame() {
       snakeHeadPositionY < 0 ||
       snakeHeadPositionY > 960
     ) {
+      setBestScore();
       return true;
     } else {
       return false;
@@ -254,13 +256,13 @@ export default function useGame() {
 
   const setBricks = () => {
     const bricksPosition = gameDataRef.current.bricksPosition;
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < settings.difficulty.bricksPerLevel; i++) {
       let positionX = getRandomPosition();
       let positionY = getRandomPosition();
       bricksPosition.push([positionX, positionY]);
       // remove brick when it has been spawned too close to snake start
       let lastBrick = bricksPosition[bricksPosition.length - 1];
-      if (lastBrick[0] < 512 && lastBrick[1] == 0) {
+      if (lastBrick[0] < 512 && lastBrick[1] === 0) {
         bricksPosition.pop();
       }
     }
@@ -277,7 +279,7 @@ export default function useGame() {
         [0, 0],
       ];
       gameDataRef.current.direction = "right";
-      gameDataRef.current.speed -= 12;
+      gameDataRef.current.speed -= settings.difficulty.speedPerLevel;
       gameDataRef.current.popup = {
         isShown: false,
         type: "",
@@ -286,6 +288,21 @@ export default function useGame() {
       setBricks();
       setApple();
       gameDataRef.current.isCounting = true;
+    }
+  };
+
+  const setBestScore = () => {
+    const storedBestScore = parseInt(`${localStorage.getItem("bestscore")}`);
+    const score = gameDataRef.current.score;
+
+    if (settings.gamemode === "classicSnake") {
+      if (score > storedBestScore) {
+        console.log("tak");
+        localStorage.setItem("bestscore", `${score}`);
+      } else if (isNaN(storedBestScore) && score > 0) {
+        console.log("nie");
+        localStorage.setItem("bestscore", `${score}`);
+      }
     }
   };
 
@@ -310,7 +327,7 @@ export default function useGame() {
       },
       isCounting: true,
     };
-    setBricks();
+    settings.gamemode === "bricksSnake" && setBricks();
     setApple();
   }
 

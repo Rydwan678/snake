@@ -106,8 +106,13 @@ canvas {
   user-select: none;
 }
 
+.popup > .game-info {
+  width: 100%;
+}
+
 .apple-icon,
-.level-icon {
+.level-icon,
+.trophy-icon {
   height: 5vh;
   margin-left: 30px;
   text-shadow: 2px 1px 5px rgb(255, 255, 255);
@@ -151,9 +156,6 @@ canvas {
   margin-right: 15px;
   max-width: 13rem;
   z-index: -9999;
-}
-
-.popup > div > button:hover {
 }
 
 .counting-down {

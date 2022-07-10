@@ -2,12 +2,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useRef } from "react";
 import useGameLogic from "./useGameLogic";
+import { Settings } from "../../types";
 
-export default function useGame(render: () => void) {
+export default function useGame(render: () => void, settings: Settings) {
   const requestID = useRef<number | null>(null);
   const previousTime = useRef<number | null>(null);
 
-  const gameLogic = useGameLogic();
+  const gameLogic = useGameLogic(settings);
 
   const [gameData, setGameData] = useState(gameLogic.gameDataRef.current);
 

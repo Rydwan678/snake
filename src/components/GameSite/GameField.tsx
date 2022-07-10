@@ -3,9 +3,11 @@ import React, { useState, useEffect, useRef } from "react";
 import useGame from "./useGame";
 import Popup from "./Popup";
 import CountingDown from "./CountingDown";
+import { Settings } from "../../types";
 
 interface GameFieldProps {
   changePage: () => void;
+  settings: Settings;
 }
 
 export default function GameField(props: GameFieldProps) {
@@ -26,7 +28,7 @@ export default function GameField(props: GameFieldProps) {
     setRunning,
     disableCounting,
     setNewLevel,
-  } = useGame(render);
+  } = useGame(render, props.settings);
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(gameDataRef.current.level);
   const [isRunning, setIsRunning] = useState(gameDataRef.current.isRunning);
@@ -35,6 +37,7 @@ export default function GameField(props: GameFieldProps) {
     type: "",
   });
   const [isCounting, setIsCounting] = useState(true);
+  const [bestScore, setBestScore] = useState<number | null>(null);
 
   useEffect(() => {
     setScore(gameDataRef.current.score);
@@ -43,6 +46,8 @@ export default function GameField(props: GameFieldProps) {
     setPopup({ ...gameDataRef.current.popup });
     setIsCounting(gameDataRef.current.isCounting);
     focusRef.current!.focus();
+    localStorage.getItem("bestscore") !== null &&
+      setBestScore(parseInt(`${localStorage.getItem("bestscore")}`));
   }, [
     gameDataRef.current.snakePosition,
     gameDataRef.current.score,
@@ -196,6 +201,9 @@ export default function GameField(props: GameFieldProps) {
         <Popup
           type={popup.type}
           level={level}
+          settings={props.settings}
+          score={gameDataRef.current.score}
+          bestScore={bestScore}
           changePage={props.changePage}
           startGame={startGame}
           setNewLevel={setNewLevel}
@@ -205,12 +213,24 @@ export default function GameField(props: GameFieldProps) {
       <div className="game-info">
         <img alt="apple" src="textures/apple.png" className="apple-icon"></img>
         <h1>{score}</h1>
-        <img
-          alt="level"
-          src="https://cdn3.iconfinder.com/data/icons/game-competition-flat/64/15_Top_Player_game_competition-512.png"
-          className="level-icon"
-        ></img>
-        <h1>{level}</h1>
+        {bestScore && props.settings.gamemode === "classicSnake" && (
+          <img
+            alt="trophy"
+            src="textures/trophy.png"
+            className="trophy-icon"
+          ></img>
+        )}
+        {bestScore && props.settings.gamemode === "classicSnake" && (
+          <h1>{bestScore}</h1>
+        )}
+        {props.settings.gamemode === "bricksSnake" && (
+          <img
+            alt="level"
+            src="https://cdn3.iconfinder.com/data/icons/game-competition-flat/64/15_Top_Player_game_competition-512.png"
+            className="level-icon"
+          ></img>
+        )}
+        {props.settings.gamemode === "bricksSnake" && <h1>{level}</h1>}
       </div>
       <div className="canvas-field" tabIndex={0}>
         <canvas ref={canvasRef}></canvas>
