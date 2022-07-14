@@ -20,6 +20,11 @@ export default function Login() {
 
   async function loginUser() {
     try {
+      console.log("0");
+      const test = await fetch("http://127.0.0.1:5500/test", {
+        method: "GET",
+      });
+      console.log("1");
       const response = await fetch("http://127.0.0.1:5500/login", {
         method: "POST",
         body: JSON.stringify(userData),
@@ -27,6 +32,8 @@ export default function Login() {
           "Content-type": "application/json",
         },
       });
+      console.log("2");
+
       const data = await response.json();
 
       setInfo(data.message);
@@ -37,6 +44,7 @@ export default function Login() {
         navigate("/", { replace: true });
       }
     } catch (error) {
+      console.log("loginError", error);
       setInfo(JSON.stringify(error));
     }
   }

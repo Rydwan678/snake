@@ -33,7 +33,6 @@ export default function UserPanel() {
   }
 
   async function getUserData() {
-    console.log("tutaj", sessionToken);
     try {
       const response = await fetch("http://127.0.0.1:5500/userPanel", {
         method: "POST",
