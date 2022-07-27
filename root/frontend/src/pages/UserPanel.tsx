@@ -23,9 +23,13 @@ export default function UserPanel() {
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    getUserData();
+  }, []);
+
   async function logout() {
     try {
-      await localStorage.setItem("token", "null");
+      await localStorage.setItem("token", "undefined");
       navigate("/", { replace: true });
     } catch (error) {
       console.log(error);
@@ -34,6 +38,7 @@ export default function UserPanel() {
 
   async function getUserData() {
     try {
+      console.log("1");
       const response = await fetch("http://127.0.0.1:5500/userPanel", {
         method: "POST",
         headers: {
@@ -42,20 +47,18 @@ export default function UserPanel() {
         },
       });
       const data = await response.json();
+      console.log("data", data);
       setUserData(data.userData.rows[0]);
     } catch (error) {
       console.log(error);
     }
   }
-  useEffect(() => {
-    getUserData();
-  }, []);
 
   return (
-    <div className="user-login">
-      <div className="login-container">
-        <div className="login-inputs">
-          <h1>Register</h1>
+    <div className="auth">
+      <div className="auth-container">
+        <div className="auth-inputs">
+          <h1>Your Profile</h1>
           <p>Name</p>
           <input name="name" defaultValue={userData.name}></input>
           <p>Email</p>
@@ -64,16 +67,15 @@ export default function UserPanel() {
           <input name="dateOfBirth" defaultValue={userData.dateOfBirth}></input>
           <p>Password</p>
           <input name="password" defaultValue={userData.password}></input>
-        </div>
-        <Link to="/">
-          <button>
-            <p>GO BACK</p>
+          <Link to="/">
+            <button>
+              <p>GO BACK</p>
+            </button>
+          </Link>
+          <button onClick={logout}>
+            <p>LOGOUT</p>
           </button>
-        </Link>
-
-        <button onClick={logout}>
-          <p>LOGOUT</p>
-        </button>
+        </div>
       </div>
     </div>
   );

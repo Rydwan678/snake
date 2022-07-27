@@ -7,6 +7,7 @@ import Game from "./pages/Game";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import UserPanel from "./pages/UserPanel";
+import AdminPanel from "./pages/AdminPanel";
 import { Settings, Setting } from "./types";
 import {
   BrowserRouter,
@@ -73,32 +74,34 @@ export default function App() {
   }
 
   return (
-    <BrowserRouter>
-      <Link to="/">
-        <h1 className="game-title">SNAKE</h1>
-      </Link>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/userPanel" element={<UserPanel />} />
-        <Route path="/" element={<Menu />} />
-        <Route
-          path="/play"
-          element={<Play changeGamemode={changeGamemode} />}
-        />
-        <Route
-          path="/options"
-          element={
-            <Options
-              toggleSetting={toggleSetting}
-              changeDifficulty={changeDifficulty}
-              settings={settings}
-            />
-          }
-        />
-        <Route path="/about" element={<About />} />
-        <Route path="/game" element={<Game settings={settings} />} />
-      </Routes>
-    </BrowserRouter>
+    <div className="app">
+      <h1 className="game-title">SNAKE</h1>
+      <BrowserRouter>
+        <Link to="/"></Link>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/userPanel" element={<UserPanel />} />
+          <Route path="/adminPanel" element={<AdminPanel />} />
+          <Route path="/" element={<Menu />} />
+          <Route
+            path="/play"
+            element={<Play changeGamemode={changeGamemode} />}
+          />
+          <Route
+            path="/options"
+            element={
+              <Options
+                toggleSetting={toggleSetting}
+                changeDifficulty={changeDifficulty}
+                settings={settings}
+              />
+            }
+          />
+          <Route path="/about" element={<About />} />
+          <Route path="/game" element={<Game settings={settings} />} />
+        </Routes>
+      </BrowserRouter>
+    </div>
   );
 }

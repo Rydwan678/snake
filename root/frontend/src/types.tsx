@@ -11,3 +11,23 @@ export interface Settings {
   difficulty: Difficulty;
   gamemode: string;
 }
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  dateOfBirth: string;
+  password: string;
+  isSelected: boolean;
+}
+
+export interface Sorting {
+  orderBy: string;
+  mode: string;
+}
+
+export type Table = "pages" | "virtual";
+
+export type Mode = "browse" | "edit";
+
+export type Window = "usersTable" | "userProfile";

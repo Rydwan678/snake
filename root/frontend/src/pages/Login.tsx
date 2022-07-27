@@ -20,11 +20,6 @@ export default function Login() {
 
   async function loginUser() {
     try {
-      console.log("0");
-      const test = await fetch("http://127.0.0.1:5500/test", {
-        method: "GET",
-      });
-      console.log("1");
       const response = await fetch("http://127.0.0.1:5500/login", {
         method: "POST",
         body: JSON.stringify(userData),
@@ -32,7 +27,6 @@ export default function Login() {
           "Content-type": "application/json",
         },
       });
-      console.log("2");
 
       const data = await response.json();
 
@@ -40,7 +34,13 @@ export default function Login() {
 
       await localStorage.setItem("token", data.token);
       const sessionToken = await localStorage.getItem("token");
-      if (sessionToken !== "null" || sessionToken !== null) {
+      console.log(data.token);
+      console.log(
+        typeof sessionToken,
+        sessionToken !== "null",
+        sessionToken !== null
+      );
+      if (sessionToken !== "undefined") {
         navigate("/", { replace: true });
       }
     } catch (error) {
@@ -50,27 +50,27 @@ export default function Login() {
   }
 
   return (
-    <div className="user-login">
-      <div className="login-container">
-        <div className="login-inputs">
+    <div className="auth">
+      <div className="auth-container">
+        <div className="auth-inputs">
           <h1>Login</h1>
           <p>Name</p>
           <input name="name" onChange={(e) => updateUserData(e)}></input>
 
           <p>Password</p>
           <input name="password" onChange={(e) => updateUserData(e)}></input>
+          <button onClick={loginUser}>
+            <p>LOGIN</p>
+          </button>
         </div>
-        <button onClick={loginUser}>
-          <p>LOGIN</p>
-        </button>
       </div>
-      <div className="login-down-text">
+      <div className="auth-down-text">
         <p>Don't have an account?</p>
         <Link to="/register">
           <p>&nbsp;Register</p>
         </Link>
       </div>
-      <div className="login-down-text">
+      <div className="auth-down-text">
         {info && <p className="info">{info}</p>}
       </div>
     </div>
