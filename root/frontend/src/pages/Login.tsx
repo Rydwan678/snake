@@ -1,78 +1,101 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  Grid,
+  Container,
+  TextField,
+  Stack,
+  Typography,
+  Button,
+  Link,
+  Paper,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import SnackbarAlert from "../components/SnackbarAlert";
+import { Alert } from "../types";
+import { RepeatOneSharp } from "@mui/icons-material";
 
 export default function Login() {
-  const [userData, setUserData] = useState({
-    name: "",
-    password: "",
+  const [alert, setAlert] = useState<Alert>({
+    open: false,
+    type: "info",
+    message: "",
   });
 
-  const [info, setInfo] = useState("");
-
-  const navigate = useNavigate();
-
-  function updateUserData(e: React.ChangeEvent<HTMLInputElement>) {
-    setUserData((previousUserData) => ({
-      ...previousUserData,
-      [e.target.name]: e.target.value,
+  function closeAlert() {
+    setAlert((previousAlert) => ({
+      ...previousAlert,
+      open: false,
     }));
   }
 
-  async function loginUser() {
+  const navigate = useNavigate();
+
+  async function loginUser(e: React.FormEvent<HTMLFormElement>) {
     try {
+      e.preventDefault();
+      const formData = new FormData(e.currentTarget);
+
       const response = await fetch("http://127.0.0.1:5500/login", {
         method: "POST",
-        body: JSON.stringify(userData),
+        body: JSON.stringify({
+          login: formData.get("login"),
+          password: formData.get("password"),
+        }),
         headers: {
           "Content-type": "application/json",
         },
       });
-
       const data = await response.json();
 
-      setInfo(data.message);
+      if (response.status === 401) {
+        setAlert({
+          open: true,
+          type: "error",
+          message: data.message,
+        });
+      } else if (response.status === 200) {
+        setAlert({
+          open: true,
+          type: "success",
+          message: data.message,
+        });
 
-      await localStorage.setItem("token", data.token);
-      const sessionToken = await localStorage.getItem("token");
-      console.log(data.token);
-      console.log(
-        typeof sessionToken,
-        sessionToken !== "null",
-        sessionToken !== null
-      );
-      if (sessionToken !== "undefined") {
-        navigate("/", { replace: true });
+        await localStorage.setItem("token", data.token);
+        if (localStorage.getItem("token") !== "undefined") {
+          navigate("/", { replace: true });
+        }
+      } else {
+        setAlert({
+          open: true,
+          type: "error",
+          message: `Unknown error ${response.status}`,
+        });
       }
     } catch (error) {
-      console.log("loginError", error);
-      setInfo(JSON.stringify(error));
+      console.log(error);
     }
   }
 
   return (
-    <div className="auth">
-      <div className="auth-container">
-        <div className="auth-inputs">
-          <h1>Login</h1>
-          <p>Name</p>
-          <input name="name" onChange={(e) => updateUserData(e)}></input>
-
-          <p>Password</p>
-          <input name="password" onChange={(e) => updateUserData(e)}></input>
-          <button onClick={loginUser}>
-            <p>LOGIN</p>
-          </button>
-        </div>
-      </div>
-      <div className="auth-down-text">
-        <p>Don't have an account?</p>
-        <Link to="/register">
-          <p>&nbsp;Register</p>
-        </Link>
-      </div>
-      <div className="auth-down-text">
-        {info && <p className="info">{info}</p>}
-      </div>
-    </div>
+    <Container>
+      <Container component={Paper} sx={{ padding: 5 }}>
+        <Grid component="form" onSubmit={loginUser}>
+          <Stack spacing={2}>
+            <Typography variant="h5">Sign in</Typography>
+            <TextField label="Login" name="login" id="login"></TextField>
+            <TextField
+              label="Password"
+              name="password"
+              id="password"
+            ></TextField>
+            <Button variant="contained" type="submit">
+              Sign In
+            </Button>
+            <Link href="/register">Create account</Link>
+          </Stack>
+        </Grid>
+      </Container>
+      <SnackbarAlert alert={alert} close={closeAlert} />
+    </Container>
   );
 }

@@ -16,6 +16,7 @@ import {
   Link,
   useNavigate,
 } from "react-router-dom";
+import { Container, AppBar, Typography } from "@mui/material";
 
 export default function App() {
   const [settings, setSettings] = useState<Settings>({
@@ -74,8 +75,7 @@ export default function App() {
   }
 
   return (
-    <div className="app">
-      <h1 className="game-title">SNAKE</h1>
+    <Container>
       <BrowserRouter>
         <Link to="/"></Link>
         <Routes>
@@ -102,6 +102,6 @@ export default function App() {
           <Route path="/game" element={<Game settings={settings} />} />
         </Routes>
       </BrowserRouter>
-    </div>
+    </Container>
   );
 }

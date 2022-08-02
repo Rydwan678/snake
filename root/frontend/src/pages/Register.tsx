@@ -1,34 +1,50 @@
 /* eslint-disable no-useless-escape */
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import useValidateData from "../hooks/useValidateData";
+import {
+  Grid,
+  Container,
+  TextField,
+  Stack,
+  Typography,
+  Button,
+  Link,
+  Paper,
+} from "@mui/material";
+import SnackbarAlert from "../components/SnackbarAlert";
+import { Alert } from "../types";
 
 export default function Register() {
-  const [userData, setUserData] = useState({
-    name: "",
-    email: "",
-    dateOfBirth: "",
-    password: "",
+  const [alert, setAlert] = useState<Alert>({
+    open: false,
+    type: "info",
+    message: "",
   });
 
-  const [info, setInfo] = useState("");
+  const validateData = useValidateData();
 
-  const validateUserData = useValidateData();
-
-  React.useEffect(() => {
-    console.log(userData);
-  }, [userData]);
-
-  function updateUserData(e: React.ChangeEvent<HTMLInputElement>) {
-    setUserData((previousUserData) => ({
-      ...previousUserData,
-      [e.target.name]: e.target.value,
+  function closeAlert() {
+    setAlert((previousAlert) => ({
+      ...previousAlert,
+      open: false,
     }));
   }
 
-  async function registerUser() {
+  async function registerUser(e: React.FormEvent<HTMLFormElement>) {
     try {
-      await validateUserData(userData, "register");
+      e.preventDefault();
+      const formData = new FormData(e.currentTarget);
+      const userData = {
+        login: (formData.get("login") as string) ?? "",
+        firstName: (formData.get("firstName") as string) ?? "",
+        lastName: (formData.get("lastName") as string) ?? "",
+        email: (formData.get("email") as string) ?? "",
+        password: (formData.get("password") as string) ?? "",
+        confirmPassword: (formData.get("confirmPassword") as string) ?? "",
+        dateOfBirth: "",
+      };
+      await validateData(userData, "register");
+
       const response = await fetch("http://127.0.0.1:5500/register", {
         method: "POST",
         body: JSON.stringify(userData),
@@ -37,49 +53,65 @@ export default function Register() {
         },
       });
       const data = await response.json();
-      setInfo(data.message);
+
+      setAlert({
+        open: true,
+        type: "success",
+        message: data.message,
+      });
     } catch (error) {
-      setInfo(JSON.stringify(error));
+      setAlert({
+        open: true,
+        type: "error",
+        message: error as string,
+      });
     }
   }
 
   return (
-    <div className="auth">
-      <div className="auth-container">
-        <div className="auth-inputs">
-          <h1>Register</h1>
-          <p>Name</p>
-          <input name="name" onChange={(e) => updateUserData(e)}></input>
-          <p>Email</p>
-          <input
-            placeholder="email@domain.org"
-            name="email"
-            onChange={(e) => updateUserData(e)}
-          ></input>
-          <p>Date of birth</p>
-          <input
-            type="date"
-            name="dateOfBirth"
-            onChange={(e) => updateUserData(e)}
-          ></input>
-          <p>Password</p>
-          <input name="password" onChange={(e) => updateUserData(e)}></input>
+    <Container>
+      <Container component={Paper} sx={{ padding: 5 }}>
+        <Grid component="form" onSubmit={registerUser}>
+          <Stack spacing={2}>
+            <Typography variant="h5">Sign Up</Typography>
+            <TextField label="Login" name="login" id="login"></TextField>
+            <Stack direction="row" spacing={2}>
+              <TextField
+                label="First name"
+                name="firstName"
+                id="firstName"
+              ></TextField>
+              <TextField
+                label="Last name"
+                name="lastName"
+                id="lastName"
+              ></TextField>
+            </Stack>
+            <TextField label="Email" name="email" id="email"></TextField>
+            <Stack direction="row" spacing={2}>
+              <TextField
+                label="Password"
+                type="password"
+                name="password"
+                id="password"
+              ></TextField>
+              <TextField
+                label="Confirm password"
+                type="password"
+                name="confirmPassword"
+                id="confirmPassword"
+              ></TextField>
+            </Stack>
 
-          <button onClick={registerUser}>
-            <p>REGISTER</p>
-          </button>
-        </div>
-      </div>
-      <div className="auth-down-text">
-        <p>Already have an account?</p>
-        <Link to="/">
-          <p>&nbsp;Sign In</p>
-        </Link>
-      </div>
-      <div className="auth-down-text">
-        {info && <p className="info">{info}</p>}
-      </div>
-    </div>
+            <Button variant="contained" type="submit">
+              Sign Up
+            </Button>
+            <Link href="/">Already have an account? Sign In.</Link>
+          </Stack>
+        </Grid>
+      </Container>
+      <SnackbarAlert alert={alert} close={closeAlert} />
+    </Container>
   );
 }
 

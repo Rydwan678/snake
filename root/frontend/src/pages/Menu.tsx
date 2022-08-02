@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Container, Stack, Button } from "@mui/material";
 
 export default function Menu() {
   const navigate = useNavigate();
@@ -13,32 +14,38 @@ export default function Menu() {
   }, []);
 
   return (
-    <div className="menu">
-      <Link to="/play">
-        <button>
-          <p>START</p>
-        </button>
-      </Link>
-      <Link to="/options" className="button">
-        <button>
-          <p>OPTIONS</p>
-        </button>
-      </Link>
-      <Link to="/userPanel" className="button">
-        <button>
-          <p>PROFILE</p>
-        </button>
-      </Link>
-      <Link to="/adminPanel" className="button">
-        <button>
-          <p>ADMIN</p>
-        </button>
-      </Link>
-      <Link to="/about" className="button">
-        <button>
-          <p>ABOUT</p>
-        </button>
-      </Link>
-    </div>
+    <Container>
+      <Stack
+        spacing={2}
+        alignItems="center"
+        sx={{ Button: { height: 50, width: 150 } }}
+      >
+        <Link to="/play">
+          <Button variant="contained">
+            <p>START</p>
+          </Button>
+        </Link>
+        <Link to="/options" className="button">
+          <Button variant="contained">
+            <p>OPTIONS</p>
+          </Button>
+        </Link>
+        <Link to="/userPanel" className="button">
+          <Button variant="contained">
+            <p>PROFILE</p>
+          </Button>
+        </Link>
+        <Link to="/adminPanel" className="button">
+          <Button variant="contained">
+            <p>ADMIN</p>
+          </Button>
+        </Link>
+        <Link to="/about" className="button">
+          <Button variant="contained">
+            <p>ABOUT</p>
+          </Button>
+        </Link>
+      </Stack>
+    </Container>
   );
 }

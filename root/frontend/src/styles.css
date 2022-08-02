@@ -1,6 +1,7 @@
 body * {
   margin: 0%;
   padding: 0%;
+  font-family: Ubuntu;
 }
 
 body {
@@ -8,7 +9,7 @@ body {
   display: flex;
   justify-content: center;
   background-image: url("../public/textures/background.jpg");
-  font-family: Ubuntu;
+
   color: rgb(255, 255, 255);
   margin: 0%;
   padding: 0%;
@@ -54,33 +55,6 @@ main {
   margin-left: 20px;
   width: 8rem;
   height: 2rem;
-}
-
-button {
-  cursor: pointer;
-  margin-top: 5px;
-  margin-bottom: 5px;
-  height: 2.5rem;
-  width: 15rem;
-  border-radius: 15px;
-  border: none;
-  background-color: rgb(238, 238, 238);
-  font-weight: 700;
-  color: rgb(105, 105, 105);
-  text-shadow: 2px 1px 5px rgb(255, 255, 255);
-}
-
-button > p {
-  font-weight: 500;
-  font-size: 1.5rem;
-  user-select: none;
-  pointer-events: none;
-}
-
-button:hover {
-  background-position: right center;
-
-  background-color: #b6b6b6;
 }
 
 .menu {
@@ -178,21 +152,6 @@ canvas {
   position: absolute;
   pointer-events: none;
   font-size: 6vh;
-}
-
-a {
-  text-decoration: none;
-  color: rgb(37, 37, 37);
-}
-
-input {
-  border: 0px;
-  height: 2.5rem;
-  width: 15rem;
-  background-color: #ffffff;
-  box-shadow: 3px 3px 3px 0px rgba(160, 160, 160, 0.8);
-  border-radius: 30px;
-  text-align: center;
 }
 
 input:focus {
@@ -306,21 +265,6 @@ input:focus {
 .user-profile-container > div > p {
   margin-top: 5px;
   margin-bottom: 5px;
-}
-
-::-webkit-scrollbar {
-  width: 15px;
-  border-radius: 10px;
-  background-color: rgb(0, 0, 0, 0.2);
-}
-
-::-webkit-scrollbar-thumb {
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 1) 25%,
-    rgba(84, 84, 84, 1) 100%
-  );
-  border-radius: 10px;
 }
 
 .admin-panel--bottom-bar {
@@ -587,4 +531,19 @@ Select {
   font-weight: 700;
   color: rgb(105, 105, 105);
   text-shadow: 2px 1px 5px rgb(255, 255, 255);
+}
+
+::-webkit-scrollbar {
+  width: 15px;
+  background-color: rgb(231, 231, 231);
+  border-radius: 50px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 50px;
+  background-color: grey;
+}
+
+a {
+  text-decoration: none;
 }

@@ -1,18 +1,18 @@
 export interface UserRegister {
-  name: string;
+  login: string;
   email: string;
   password: string;
 }
 
 export interface UserLogin {
   id: number;
-  name: string;
+  login: string;
   password: string;
 }
 
 export interface UserData {
   id: number;
-  name: string;
+  login: string;
   email: string;
   dateOfBirth: string;
   password: string;

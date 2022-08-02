@@ -77,7 +77,7 @@ async function getUsers(
 ) {
   try {
     const responseUsers = await pool.query(
-      `SELECT * FROM users WHERE name iLIKE '%${search}%'
+      `SELECT * FROM users WHERE login iLIKE '%${search}%'
       OR email iLike '%${search}%' ORDER BY ${sorting.orderBy} ${
         sorting.mode
       } LIMIT ${table === "pages" ? usersCount : "9999999999999"} OFFSET ${

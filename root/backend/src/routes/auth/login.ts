@@ -19,14 +19,14 @@ router.post("/login", async (req: { body: UserLogin }, res: any) => {
     const token = jwt.sign(user, ACCESS_TOKEN);
     res.status(200).json({ message: "You logged in", token: token });
   } catch (error) {
-    -res.status(401).json({ message: error });
+    res.status(401).json({ message: error });
   }
 });
 
 function checkForAccount(user: UserLogin) {
   return new Promise<UserData>(async (resolve, reject) => {
     const response = await pool.query(
-      `SELECT * FROM users WHERE password = '${user.password}' AND (name = '${user.name}' OR email = '${user.name}')`
+      `SELECT * FROM users WHERE password = '${user.password}' AND (login = '${user.login}' OR email = '${user.login}')`
     );
 
     const userData = response.rows[0];

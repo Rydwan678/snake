@@ -1,4 +1,14 @@
+import { StringLiteral } from "typescript";
+
 export type Setting = "audio";
+
+export type TableType = "pages" | "virtual";
+
+export type Mode = "browse" | "edit";
+
+export type Way = "previous" | "next";
+
+type AlertType = "error" | "warning" | "info" | "success";
 
 interface Difficulty {
   name: string;
@@ -14,11 +24,14 @@ export interface Settings {
 
 export interface User {
   id: number;
-  name: string;
+  login: string;
+  firstName: string;
+  lastName: string;
   email: string;
   dateOfBirth: string;
   password: string;
   isSelected: boolean;
+  role: string;
 }
 
 export interface Sorting {
@@ -26,8 +39,8 @@ export interface Sorting {
   mode: string;
 }
 
-export type Table = "pages" | "virtual";
-
-export type Mode = "browse" | "edit";
-
-export type Window = "usersTable" | "userProfile";
+export interface Alert {
+  open: boolean;
+  type: AlertType;
+  message: string;
+}

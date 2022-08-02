@@ -11,7 +11,7 @@ router.post("/register", async (req: { body: UserRegister }, res: any) => {
     await validateIfEmailAlreadyExist(user);
     await validateIfNameAlreadyExist(user);
     await pool.query(
-      `INSERT INTO users (name, email, password) VALUES ('${user.name}', '${user.email}', '${user.password}')`
+      `INSERT INTO users (login, email, password) VALUES ('${user.login}', '${user.email}', '${user.password}')`
     );
     res.status(200).json({ message: "Account created successfully" });
   } catch (error: any) {
@@ -35,7 +35,7 @@ function validateIfEmailAlreadyExist(user: UserRegister) {
 function validateIfNameAlreadyExist(user: UserRegister) {
   return new Promise(async (resolve, reject) => {
     const accountsWithSameName = await pool.query(
-      `SELECT * FROM users WHERE name = '${user.name}'`
+      `SELECT * FROM users WHERE login = '${user.login}'`
     );
     if (accountsWithSameName.rows.length === 0) {
       resolve("success");

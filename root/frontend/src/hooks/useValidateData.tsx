@@ -3,10 +3,13 @@ import React from "react";
 type Action = "register" | "panel";
 
 interface User {
-  name: string;
+  login: string;
+  firstName: string;
+  lastName: string;
   email: string;
   dateOfBirth: string;
   password: string;
+  confirmPassword: string;
 }
 
 export default function useValidateData() {
@@ -24,7 +27,7 @@ export default function useValidateData() {
 
   function validateName(user: User) {
     return new Promise((resolve, reject) => {
-      if (user.name.length <= 20) {
+      if (user.login.length <= 20) {
         resolve("success");
       } else {
         reject("Username can't be longer than 20 characters");
@@ -48,6 +51,9 @@ export default function useValidateData() {
 
   function validatePassword(user: User) {
     return new Promise((resolve, reject) => {
+      if (user.password !== user.confirmPassword) {
+        reject("Your passwords do not match");
+      }
       if (user.password.length < 5) {
         reject("Your password should have at least 5 characters");
       } else if (user.password.search(/[A-Z]/) < 0) {
