@@ -43,7 +43,7 @@ export default function Register() {
         confirmPassword: (formData.get("confirmPassword") as string) ?? "",
         dateOfBirth: "",
       };
-      await validateData(userData, "register");
+      await validateData(userData);
 
       const response = await fetch("http://127.0.0.1:5500/register", {
         method: "POST",

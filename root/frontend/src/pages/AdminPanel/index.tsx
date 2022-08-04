@@ -94,7 +94,7 @@ function AdminPanel() {
       setAlert({
         open: true,
         type: "success",
-        message: `You successfully deleted ${selectedUsers} user${
+        message: `You successfully deleted ${selectedUsers.length} user${
           selectedUsers.length > 1 ? "s" : ""
         }`,
       });

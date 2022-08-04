@@ -1,5 +1,5 @@
 import express from "express";
-import { UserLogin, UserData } from "../../types";
+import { UserLogin, GetUserData } from "../../types";
 import jwt from "jsonwebtoken";
 
 const pool = require("../../database");
@@ -24,7 +24,7 @@ router.post("/login", async (req: { body: UserLogin }, res: any) => {
 });
 
 function checkForAccount(user: UserLogin) {
-  return new Promise<UserData>(async (resolve, reject) => {
+  return new Promise<GetUserData>(async (resolve, reject) => {
     const response = await pool.query(
       `SELECT * FROM users WHERE password = '${user.password}' AND (login = '${user.login}' OR email = '${user.login}')`
     );

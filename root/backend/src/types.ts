@@ -10,10 +10,19 @@ export interface UserLogin {
   password: string;
 }
 
-export interface UserData {
+export interface GetUserData {
   id: number;
   login: string;
   email: string;
   dateOfBirth: string;
   password: string;
 }
+
+export interface UpdateUserData {
+  login?: string;
+  firstname?: string;
+  lastname?: string;
+  description?: string;
+}
+
+export type Change = "login" | "firstname" | "lastname" | "description";

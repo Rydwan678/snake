@@ -81,7 +81,16 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/userPanel" element={<UserPanel />} />
+          <Route
+            path="/userPanel"
+            element={
+              <UserPanel
+                toggleSetting={toggleSetting}
+                changeDifficulty={changeDifficulty}
+                settings={settings}
+              />
+            }
+          />
           <Route path="/adminPanel" element={<AdminPanel />} />
           <Route path="/" element={<Menu />} />
           <Route

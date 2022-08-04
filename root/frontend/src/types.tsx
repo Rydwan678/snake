@@ -8,6 +8,8 @@ export type Mode = "browse" | "edit";
 
 export type Way = "previous" | "next";
 
+export type Change = "login" | "firstname" | "lastname" | "description";
+
 type AlertType = "error" | "warning" | "info" | "success";
 
 interface Difficulty {
@@ -25,13 +27,15 @@ export interface Settings {
 export interface User {
   id: number;
   login: string;
-  firstName: string;
-  lastName: string;
+  firstname: string;
+  lastname: string;
   email: string;
   dateOfBirth: string;
   password: string;
+  confirmPassword?: string;
   isSelected: boolean;
   role: string;
+  description: string;
 }
 
 export interface Sorting {
@@ -43,4 +47,11 @@ export interface Alert {
   open: boolean;
   type: AlertType;
   message: string;
+}
+
+export interface Changes {
+  login?: string;
+  firstname?: string;
+  lastname?: string;
+  description?: string;
 }

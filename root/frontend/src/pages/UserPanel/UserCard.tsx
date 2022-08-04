@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Stack, Avatar, Paper, Typography } from "@mui/material";
+import { Box, Stack, Avatar, Paper, Typography } from "@mui/material";
 import { User } from "../../types";
 
 interface UserCardProps {
@@ -8,7 +8,7 @@ interface UserCardProps {
 
 function UserCard(props: UserCardProps) {
   return (
-    <Container component={Paper} sx={{ padding: 2, height: 300 }}>
+    <Box component={Paper} sx={{ padding: 2, height: "350px" }}>
       <Stack alignItems="center" spacing={2}>
         <Avatar
           alt={props.user.login}
@@ -16,12 +16,13 @@ function UserCard(props: UserCardProps) {
           sx={{ width: 80, height: 80 }}
         />
         <Typography variant="h5">
-          {`${props.user.firstName ?? "John"} ${props.user.lastName ?? "Doe"}`}
+          {`${props.user.firstname ?? ""} ${props.user.lastname ?? ""}`}
         </Typography>
-        <Typography sx={{ color: "gray" }}>User description</Typography>
-        <Typography sx={{ color: "gray" }}>User Address</Typography>
+        <Typography sx={{ color: "gray" }}>
+          {props.user.description ?? ""}
+        </Typography>
       </Stack>
-    </Container>
+    </Box>
   );
 }
 
