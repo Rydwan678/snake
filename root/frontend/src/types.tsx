@@ -1,5 +1,3 @@
-import { StringLiteral } from "typescript";
-
 export type Setting = "audio";
 
 export type TableType = "pages" | "virtual";
@@ -9,6 +7,10 @@ export type Mode = "browse" | "edit";
 export type Way = "previous" | "next";
 
 export type Change = "login" | "firstname" | "lastname" | "description";
+
+type SortingMode = "ASC" | "DESC";
+
+type OrderBy = "id" | "login" | "email" | "role";
 
 type AlertType = "error" | "warning" | "info" | "success";
 
@@ -39,8 +41,8 @@ export interface User {
 }
 
 export interface Sorting {
-  orderBy: string;
-  mode: string;
+  orderBy: OrderBy;
+  mode: SortingMode;
 }
 
 export interface Alert {

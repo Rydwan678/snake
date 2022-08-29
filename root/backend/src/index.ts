@@ -1,28 +1,8 @@
-import jwt from "jsonwebtoken";
-import express from "express";
-import cors from "cors";
+import { Store } from "./interfaces";
+import * as express from "./REST/index";
+import * as webSocket from "./webSocket";
 
-const pool = require("./database");
+const store: Store = { users: [] };
 
-const ACCESS_TOKEN = "123456789";
-
-async function main() {
-  const app = express();
-
-  const routes = require("./routes");
-
-  app.use(cors());
-  app.use(express.json());
-
-  app.use("", routes);
-
-  app.get("/*", (req: any, res: any) => {
-    res.end();
-  });
-
-  app.listen(5500, () => {
-    console.log("server started");
-  });
-}
-
-main();
+express.load(store);
+webSocket.load(store);

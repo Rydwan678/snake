@@ -16,7 +16,8 @@ import {
   Link,
   useNavigate,
 } from "react-router-dom";
-import { Container, AppBar, Typography } from "@mui/material";
+import { Container } from "@mui/material";
+import Chat from "./components/Chat";
 
 export default function App() {
   const [settings, setSettings] = useState<Settings>({
@@ -76,6 +77,7 @@ export default function App() {
 
   return (
     <Container>
+      {localStorage.getItem("token") && <Chat />}
       <BrowserRouter>
         <Link to="/"></Link>
         <Routes>

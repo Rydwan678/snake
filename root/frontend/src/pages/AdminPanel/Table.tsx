@@ -7,17 +7,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { Checkbox } from "@mui/material";
 import { TableVirtuoso } from "react-virtuoso";
-import { Remove } from "@mui/icons-material";
-
-export interface User {
-  id: number;
-  login: string;
-  email: string;
-  dateOfBirth: string;
-  password: string;
-  isSelected: boolean;
-  role: string;
-}
+import { User } from "../../types";
 
 export type Mode = "browse" | "edit";
 

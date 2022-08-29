@@ -8,7 +8,7 @@ export default function Menu() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    if (token === "undefined") {
+    if (token === "undefined" || token === null) {
       navigate("/login", { replace: true });
     }
   }, []);

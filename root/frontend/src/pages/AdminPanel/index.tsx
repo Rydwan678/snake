@@ -8,6 +8,7 @@ import {
   SelectChangeEvent,
   ThemeProvider,
   Paper,
+  CircularProgress,
 } from "@mui/material";
 import { User, TableType, Alert } from "../../types";
 import DeleteAlert from "./DeleteAlert";
@@ -29,8 +30,9 @@ function AdminPanel() {
     type: "info",
     message: "",
   });
-  const [deleteAlert, setDeleteAlert] = React.useState(false);
-  const [selectedUsers, setSelectedUsers] = React.useState<number[]>([]);
+  const [deleteAlert, setDeleteAlert] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setSelectedUsers(() => {
@@ -54,11 +56,18 @@ function AdminPanel() {
 
   async function getUsers() {
     try {
-      const response = await fetch("http://127.0.0.1:5500/getUsers", {
-        method: "POST",
-        body: JSON.stringify({ page, sorting, searchBar, usersCount, table }),
+      const response = await fetch("http://127.0.0.1:8080/users", {
+        method: "GET",
         headers: {
           "Content-type": "application/json",
+          authorization: `Beaer ${localStorage.getItem("token")}`,
+          params: JSON.stringify({
+            page,
+            sorting,
+            searchBar,
+            usersCount,
+            table,
+          }),
         },
       });
       const data = await response.json();
@@ -76,6 +85,7 @@ function AdminPanel() {
       );
 
       setUsers(updatedUsers);
+      setLoading(false);
     } catch (error) {
       console.log("error", error);
     }
@@ -83,13 +93,16 @@ function AdminPanel() {
 
   async function deleteUsers() {
     try {
-      const response = await fetch("http://127.0.0.1:5500/deleteUsers", {
-        method: "POST",
-        body: JSON.stringify({ selectedUsers }),
-        headers: {
-          "Content-type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `http://127.0.0.1:8080/users/${selectedUsers.toString()}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-type": "application/json",
+            authorization: `Beaer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       const data = await response.json();
       setAlert({
         open: true,
@@ -179,12 +192,18 @@ function AdminPanel() {
           selectedUsersCount={selectedUsers.length}
           deleteUsers={deleteUsers}
         />
+
         <TopBar search={search} confirmDelete={confirmDelete} />
         <UsersTable
           users={users}
           selectUser={selectUser}
           selectAllUsers={selectAllUsers}
         />
+        {loading && (
+          <CircularProgress
+            sx={{ position: "absolute", left: "50%", top: "50%" }}
+          />
+        )}
         <BottomBar
           changeTable={changeTable}
           changePage={changePage}

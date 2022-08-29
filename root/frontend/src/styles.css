@@ -154,12 +154,6 @@ canvas {
   font-size: 6vh;
 }
 
-input:focus {
-  outline: none;
-  box-shadow: 1px 1px 10px rgb(10, 10, 10);
-  transition: 0.3s;
-}
-
 .auth {
   display: flex;
   flex-flow: column;

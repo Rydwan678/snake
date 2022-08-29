@@ -5,7 +5,7 @@ import { User, Change, Changes, Setting, Settings, Alert } from "../../types";
 import InfoCard from "./InfoCard";
 import SafetyCard from "./SafetyCard";
 import SettingsCard from "./SettingsCard";
-import UserCard from "./UserCard";
+import UserCard from "../../components/UserCard";
 import BottomBar from "./BottomBar";
 import NavigationBar from "./NavigationBar";
 import SnackbarAlert from "../../components/SnackbarAlert";
@@ -61,16 +61,16 @@ export default function UserPanel(props: UserPanelProps) {
 
   async function getUserData() {
     try {
-      const response = await fetch("http://127.0.0.1:5500/userPanel", {
-        method: "POST",
+      const response = await fetch("http://127.0.0.1:8080/me", {
+        method: "GET",
         headers: {
           "Content-type": "application/json",
-          authorization: `Beaer ${sessionToken}`,
+          authorization: `Beaer ${localStorage.getItem("token")}`,
         },
       });
       const data = await response.json();
 
-      setUser(data.userData.rows[0]);
+      setUser(data.user[0]);
     } catch (error) {
       console.log(error);
     }
@@ -97,7 +97,7 @@ export default function UserPanel(props: UserPanelProps) {
       const userID = user.id;
       try {
         changes && (await validateUserData(changes));
-        const response = await fetch("http://127.0.0.1:5500/updateUser", {
+        const response = await fetch("http://127.0.0.1:8080/updateUser", {
           method: "POST",
           body: JSON.stringify({ changes, userID }),
           headers: {
@@ -139,7 +139,7 @@ export default function UserPanel(props: UserPanelProps) {
             <NavigationBar window={window} changeWindow={changeWindow} />
           </Grid>
           <Grid item xs={12} sm={4}>
-            <UserCard user={user} />
+            <UserCard user={user} type="userPanel" />
           </Grid>
           <Grid item xs={12} sm={8}>
             {window === 0 && (

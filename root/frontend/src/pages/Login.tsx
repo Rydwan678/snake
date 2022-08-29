@@ -35,7 +35,7 @@ export default function Login() {
       e.preventDefault();
       const formData = new FormData(e.currentTarget);
 
-      const response = await fetch("http://127.0.0.1:5500/login", {
+      const response = await fetch("http://127.0.0.1:8080/login", {
         method: "POST",
         body: JSON.stringify({
           login: formData.get("login"),

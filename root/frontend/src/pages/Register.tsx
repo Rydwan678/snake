@@ -45,7 +45,7 @@ export default function Register() {
       };
       await validateData(userData);
 
-      const response = await fetch("http://127.0.0.1:5500/register", {
+      const response = await fetch("http://127.0.0.1:8080/register", {
         method: "POST",
         body: JSON.stringify(userData),
         headers: {
@@ -117,7 +117,7 @@ export default function Register() {
 
 // async function registerUser(user: any) {
 //   try {
-//     const response = await fetch("http://127.0.0.1:5500/register", {
+//     const response = await fetch("http://127.0.0.1:8080/register", {
 //       method: "POST",
 //       body: JSON.stringify({
 //         name: user.login.username,
