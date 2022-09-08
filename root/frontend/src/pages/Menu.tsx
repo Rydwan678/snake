@@ -25,11 +25,7 @@ export default function Menu() {
             <p>START</p>
           </Button>
         </Link>
-        <Link to="/options" className="button">
-          <Button variant="contained">
-            <p>OPTIONS</p>
-          </Button>
-        </Link>
+
         <Link to="/userPanel" className="button">
           <Button variant="contained">
             <p>PROFILE</p>

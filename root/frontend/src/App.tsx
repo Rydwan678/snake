@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Menu from "./pages/Menu";
-import Options from "./pages/Options";
 import About from "./pages/About";
 import Play from "./pages/Play";
 import Game from "./pages/Game";
@@ -98,16 +97,6 @@ export default function App() {
           <Route
             path="/play"
             element={<Play changeGamemode={changeGamemode} />}
-          />
-          <Route
-            path="/options"
-            element={
-              <Options
-                toggleSetting={toggleSetting}
-                changeDifficulty={changeDifficulty}
-                settings={settings}
-              />
-            }
           />
           <Route path="/about" element={<About />} />
           <Route path="/game" element={<Game settings={settings} />} />

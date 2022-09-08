@@ -1,4 +1,5 @@
 import React from "react";
+import { Button, Box, Stack } from "@mui/material";
 import { Link } from "react-router-dom";
 
 interface PlayProps {
@@ -7,25 +8,29 @@ interface PlayProps {
 
 export default function Play(props: PlayProps) {
   return (
-    <div>
-      <Link to="/game">
-        <button
-          onClick={() => {
-            props.changeGamemode("classicSnake");
-          }}
-        >
-          Classic Snake
-        </button>
-      </Link>
-      <Link to="/game">
-        <button
-          onClick={() => {
-            props.changeGamemode("bricksSnake");
-          }}
-        >
-          Bricks Snake
-        </button>
-      </Link>
-    </div>
+    <Box>
+      <Stack direction="row" spacing={2}>
+        <Link to="/game">
+          <Button
+            onClick={() => {
+              props.changeGamemode("classicSnake");
+            }}
+            variant="contained"
+          >
+            Classic Snake
+          </Button>
+        </Link>
+        <Link to="/game">
+          <Button
+            onClick={() => {
+              props.changeGamemode("bricksSnake");
+            }}
+            variant="contained"
+          >
+            Bricks Snake
+          </Button>
+        </Link>
+      </Stack>
+    </Box>
   );
 }
