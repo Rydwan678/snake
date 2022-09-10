@@ -1,16 +1,11 @@
 import React from "react";
 import GameField from "./GameField";
-import { Settings } from "../../types";
 
-interface GameSiteProps {
-  settings: Settings;
-}
-
-export default function GameSite(props: GameSiteProps) {
+export default function GameSite() {
   return (
     <main className="game-site">
       <div>
-        <GameField settings={props.settings} />
+        <GameField />
       </div>
     </main>
   );

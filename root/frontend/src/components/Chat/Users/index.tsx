@@ -1,33 +1,23 @@
 import React from "react";
-import { Box, Stack, Input } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import UserCard from "./UserCard";
-import { Message } from "../../../../../shared/interfaces";
+import { AppContext, AppContextType } from "../../../context/app";
 
-interface UsersProps {
-  users:
-    | {
-        id: number;
-        messages: Message[] | undefined;
-        online: boolean;
-      }[]
-    | undefined;
-  me: number;
-  recipient: number | undefined;
-  token: string | null;
-  changeRecipient: (id: number) => void;
-}
+function Users() {
+  const { users, me, recipient, fn } = React.useContext(
+    AppContext
+  ) as AppContextType;
 
-function Users(props: UsersProps) {
   const usersElement =
-    props.users &&
-    props.users.map(
+    users &&
+    users.map(
       (user) =>
-        user.id !== props.me && (
+        user.id !== me && (
           <UserCard
             user={user}
-            recipient={props.recipient}
-            token={props.token}
-            changeReceiver={props.changeRecipient}
+            recipient={recipient}
+            token={localStorage.getItem("token")}
+            changeReceiver={fn.changeRecipient}
           />
         )
     );

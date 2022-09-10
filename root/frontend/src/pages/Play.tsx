@@ -1,19 +1,18 @@
 import React from "react";
 import { Button, Box, Stack } from "@mui/material";
 import { Link } from "react-router-dom";
+import { AppContext, AppContextType } from "../context/app";
 
-interface PlayProps {
-  changeGamemode: (selectedGamemode: string) => void;
-}
+export default function Play() {
+  const { fn } = React.useContext(AppContext) as AppContextType;
 
-export default function Play(props: PlayProps) {
   return (
     <Box>
       <Stack direction="row" spacing={2}>
         <Link to="/game">
           <Button
             onClick={() => {
-              props.changeGamemode("classicSnake");
+              fn.changeGamemode("classicSnake");
             }}
             variant="contained"
           >
@@ -23,7 +22,7 @@ export default function Play(props: PlayProps) {
         <Link to="/game">
           <Button
             onClick={() => {
-              props.changeGamemode("bricksSnake");
+              fn.changeGamemode("bricksSnake");
             }}
             variant="contained"
           >

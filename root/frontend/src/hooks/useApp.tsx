@@ -1,17 +1,26 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Packet, Message } from "../../../../shared/interfaces";
-import { getMe } from "../../ApiServices";
+import { Packet, Message } from "../../../shared/interfaces";
+import { getMe } from "../ApiServices";
+import { Settings, Setting } from "../types";
 
-export default function useChat() {
-  const [me, setMe] = useState<number>();
+export default function useApp() {
   const [users, setUsers] =
     useState<
       { id: number; messages: Message[] | undefined; online: boolean }[]
     >();
-  const [content, setContent] = useState<string>();
+  const [me, setMe] = useState<number>();
   const [recipient, setRecipient] = useState<number>();
-  const [pool, setPool] = useState<Packet[]>([]);
+  const [settings, setSettings] = useState<Settings>({
+    audio: true,
+    difficulty: {
+      name: "NORMAL",
+      speedPerLevel: 12,
+      bricksPerLevel: 5,
+    },
+    gamemode: "",
+  });
 
+  const [pool, setPool] = useState<Packet[]>([]);
   const poolRef = useRef<Packet[]>([]);
 
   const ws = useRef<WebSocket | null>(null);
@@ -156,7 +165,7 @@ export default function useChat() {
 
   useEffect(() => {
     if (recipient) {
-      sendReadInfo();
+      sendReadStatus();
     }
   }, [recipient]);
 
@@ -172,26 +181,13 @@ export default function useChat() {
   function reconnect() {
     ws.current?.close();
     ws.current = new WebSocket("ws://localhost:8080");
-
-    // ws.current?.send(
-    //   JSON.stringify({
-    //     packetId: "reconnect",
-    //     data: { userToken: localStorage.getItem("token") as string },
-    //   })
-    // );
-  }
-
-  function updateContent(
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) {
-    setContent(e.target.value);
   }
 
   function changeRecipient(id: number) {
     setRecipient(id);
   }
 
-  async function sendMessage() {
+  async function sendMessage(content: string) {
     if (content && me && recipient) {
       if (users && recipient) {
         const recipientIndex = users.findIndex((user) => user.id === recipient);
@@ -280,13 +276,12 @@ export default function useChat() {
     }
 
     if (from === recipient) {
-      sendReadInfo();
+      sendReadStatus();
     }
   }
 
-  async function sendReadInfo() {
+  async function sendReadStatus() {
     try {
-      console.log("sending read info to", recipient);
       await ws.current?.send(
         JSON.stringify({
           packetId: "messageInfo",
@@ -338,13 +333,63 @@ export default function useChat() {
     updatedUsers && setUsers([...updatedUsers]);
   }
 
+  function changeDifficulty() {
+    const levels = [
+      {
+        name: "EASY",
+        speedPerLevel: 6,
+        bricksPerLevel: 4,
+      },
+      {
+        name: "NORMAL",
+        speedPerLevel: 12,
+        bricksPerLevel: 5,
+      },
+      {
+        name: "HARD",
+        speedPerLevel: 18,
+        bricksPerLevel: 6,
+      },
+    ];
+    const currentLevel = levels.findIndex(
+      (element) => element.name === settings.difficulty.name
+    );
+    const nextLevel = levels[currentLevel + 1]
+      ? levels[currentLevel + 1]
+      : levels[0];
+    setSettings((previousSettings) => ({
+      ...previousSettings,
+      difficulty: nextLevel,
+    }));
+  }
+
+  function changeGamemode(selectedGamemode: string) {
+    setSettings((previousSettings) => ({
+      ...previousSettings,
+      gamemode: selectedGamemode,
+    }));
+  }
+
+  function toggleSetting(setting: Setting) {
+    setSettings((previousSettings) => ({
+      ...previousSettings,
+      [setting]: !previousSettings[setting],
+    }));
+  }
+
   return {
-    users,
-    me,
-    recipient,
-    changeRecipient,
-    content,
-    updateContent,
-    sendMessage,
+    users: users,
+    me: me,
+    recipient: recipient,
+    settings: settings,
+    fn: {
+      sendMessage: sendMessage,
+      changeRecipient: changeRecipient,
+      sendReadStatus: sendReadStatus,
+      changeGamemode: changeGamemode,
+      changeDifficulty: changeDifficulty,
+      toggleSetting: toggleSetting,
+      connect: connect,
+    },
   };
 }

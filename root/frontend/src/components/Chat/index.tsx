@@ -1,37 +1,26 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Box, Stack, Paper, Divider } from "@mui/material";
 import SearchBar from "./SearchBar";
 import Users from "./Users";
 import TopBar from "./TopBar";
 import Messages from "./Messages";
 import BottomBar from "./BottomBar";
-import useChat from "./useChat";
-import { useEffect } from "react";
+import { AppContext, AppContextType } from "../../context/app";
 
 function Chat() {
-  const {
-    users,
-    me,
-    recipient,
-    changeRecipient,
-    content,
-    updateContent,
-    sendMessage,
-  } = useChat();
+  const [content, setContent] = useState<string>();
+
+  function updateContent(
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) {
+    setContent(e.target.value);
+  }
+
+  const { users, me, recipient, fn } = React.useContext(
+    AppContext
+  ) as AppContextType;
 
   const boxRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    console.log("users", users);
-  }, [users]);
-
-  useEffect(() => {
-    console.log("me", me);
-  }, [me]);
-
-  useEffect(() => {
-    console.log("recipient", recipient);
-  }, [recipient]);
 
   return (
     <Stack
@@ -39,15 +28,7 @@ function Chat() {
       component={Paper}
     >
       <SearchBar />
-      {users && users.length > 2 && me && (
-        <Users
-          users={users}
-          me={me}
-          recipient={recipient}
-          token={localStorage.getItem("token")}
-          changeRecipient={changeRecipient}
-        />
-      )}
+      {users && users.length > 2 && me && <Users />}
       <Divider />
       <Box
         sx={{
@@ -71,7 +52,7 @@ function Chat() {
           content={content}
           updateContent={updateContent}
           sendMessage={() => {
-            sendMessage();
+            content && fn.sendMessage(content);
             boxRef.current &&
               (boxRef.current.scrollTop = boxRef.current.scrollHeight);
           }}

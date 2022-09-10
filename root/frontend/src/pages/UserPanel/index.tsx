@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { User, Change, Changes, Setting, Settings, Alert } from "../../types";
+import { useNavigate } from "react-router-dom";
+import { User, Change, Changes, Alert } from "../../types";
 import InfoCard from "./InfoCard";
 import SafetyCard from "./SafetyCard";
 import SettingsCard from "./SettingsCard";
@@ -9,19 +9,10 @@ import UserCard from "../../components/UserCard";
 import BottomBar from "./BottomBar";
 import NavigationBar from "./NavigationBar";
 import SnackbarAlert from "../../components/SnackbarAlert";
-import { Grid, Container, Box } from "@mui/material";
+import { Grid, Box } from "@mui/material";
 import useValidateData from "../../hooks/useValidateData";
 
-interface UserPanelProps {
-  toggleSetting: (setting: Setting) => void;
-  changeDifficulty: () => void;
-  settings: Settings;
-}
-
-export default function UserPanel(props: UserPanelProps) {
-  const [sessionToken, setSessionToken] = useState(
-    localStorage.getItem("token")
-  );
+export default function UserPanel() {
   const [window, setWindow] = useState(0);
   const [alert, setAlert] = useState<Alert>({
     open: false,
@@ -146,13 +137,7 @@ export default function UserPanel(props: UserPanelProps) {
               <InfoCard getChanges={getChanges} changes={changes} user={user} />
             )}
             {window === 1 && <SafetyCard />}
-            {window === 2 && (
-              <SettingsCard
-                toggleSetting={props.toggleSetting}
-                changeDifficulty={props.changeDifficulty}
-                settings={props.settings}
-              />
-            )}
+            {window === 2 && <SettingsCard />}
           </Grid>
           <Grid item xs={12} sm={12}>
             <BottomBar
