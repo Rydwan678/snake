@@ -36,3 +36,11 @@ export interface ChatUser {
   id: number;
   messages: Message[];
 }
+
+export interface LobbyType {
+  id: string;
+  users: {
+    id: number;
+    leader: boolean;
+  }[];
+}

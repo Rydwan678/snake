@@ -106,6 +106,9 @@ export default function useApp() {
 
   useEffect(() => {
     async function webSocketConnection() {
+      const response = await getMe(localStorage.getItem("token"));
+      setMe(response[0].id);
+
       ws.current = new WebSocket("ws://localhost:8080");
       ws.current.onopen = (e) => {
         if (localStorage.getItem("token")) {
@@ -123,10 +126,6 @@ export default function useApp() {
 
         poolRef.current.push(packet);
       };
-
-      const response = await getMe(localStorage.getItem("token"));
-
-      setMe(response[0].id);
     }
 
     webSocketConnection();
@@ -139,6 +138,7 @@ export default function useApp() {
       }
       ws.current?.send(
         JSON.stringify({
+          module: "app",
           packetId: "ping",
           data: { userToken: localStorage.getItem("token") },
         })
@@ -172,6 +172,7 @@ export default function useApp() {
   function connect() {
     ws.current?.send(
       JSON.stringify({
+        module: "app",
         packetId: "connect",
         data: { userToken: localStorage.getItem("token") as string },
       })
@@ -218,6 +219,7 @@ export default function useApp() {
         try {
           await ws.current?.send(
             JSON.stringify({
+              module: "chat",
               packetId: "message",
               data: {
                 message: {
@@ -284,6 +286,7 @@ export default function useApp() {
     try {
       await ws.current?.send(
         JSON.stringify({
+          module: "chat",
           packetId: "messageInfo",
           data: {
             messageInfo: {
@@ -316,7 +319,7 @@ export default function useApp() {
             }
           : user
       );
-      console.log("updatedusersinfo", updatedUsers, to);
+
       setUsers(updatedUsers);
       return;
     }

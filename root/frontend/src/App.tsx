@@ -2,6 +2,7 @@ import React from "react";
 import Menu from "./pages/Menu";
 import About from "./pages/About";
 import Play from "./pages/Play";
+import Lobby from "./pages/Lobby";
 import Game from "./pages/Game";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -29,6 +30,7 @@ export default function App() {
             <Route path="/adminPanel" element={<AdminPanel />} />
             <Route path="/" element={<Menu />} />
             <Route path="/play" element={<Play />} />
+            <Route path="/lobby" element={<Lobby />} />
             <Route path="/about" element={<About />} />
             <Route path="/game" element={<Game />} />
           </Routes>

@@ -29,6 +29,16 @@ export default function Play() {
             Bricks Snake
           </Button>
         </Link>
+        <Link to="/lobby">
+          <Button
+            onClick={() => {
+              fn.changeGamemode("multiplayer");
+            }}
+            variant="contained"
+          >
+            Multiplayer
+          </Button>
+        </Link>
       </Stack>
     </Box>
   );

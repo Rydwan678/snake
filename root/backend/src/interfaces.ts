@@ -1,11 +1,20 @@
 import { Express } from "express";
 import { Server } from "http";
-import WebSocket from "Ws";
+import WebSocket from "ws";
 
 interface User {
   id: number;
   ws: WebSocket.WebSocket;
   lastPing: number;
+  lobby: number | undefined;
+}
+
+interface Lobby {
+  id: string;
+  users: {
+    id: number;
+    leader: boolean;
+  }[];
 }
 
 export interface Store {
@@ -13,6 +22,8 @@ export interface Store {
   server?: Server;
   wsServer?: WebSocket.Server;
   users: User[];
+  lobbies: Lobby[];
+  games: [];
 }
 
 interface Message {
@@ -36,12 +47,14 @@ interface Data {
 }
 
 export interface Packet {
+  module: "app" | "chat" | "multiplayer";
   packetId:
     | "connect"
     | "reconnect"
     | "message"
     | "ping"
     | "getUsers"
-    | "messageInfo";
+    | "messageInfo"
+    | "createLobby";
   data: Data;
 }
