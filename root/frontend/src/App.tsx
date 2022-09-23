@@ -13,6 +13,7 @@ import { Container } from "@mui/material";
 import Chat from "./components/Chat";
 import { AppContext } from "./context/app";
 import useApp from "./hooks/useApp";
+import SnackbarAlert from "./components/SnackbarAlert";
 
 export default function App() {
   const value = useApp();
@@ -35,6 +36,7 @@ export default function App() {
             <Route path="/game" element={<Game />} />
           </Routes>
         </BrowserRouter>
+        <SnackbarAlert />
       </AppContext.Provider>
     </Container>
   );

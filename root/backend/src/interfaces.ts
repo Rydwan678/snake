@@ -2,11 +2,19 @@ import { Express } from "express";
 import { Server } from "http";
 import WebSocket from "ws";
 
+interface Invite {
+  id: string;
+  from: number;
+  to: number;
+  lobbyID: string;
+}
+
 interface User {
   id: number;
   ws: WebSocket.WebSocket;
   lastPing: number;
-  lobby: number | undefined;
+  lobby: string | null;
+  invites: Invite[] | null;
 }
 
 interface Lobby {
@@ -41,9 +49,26 @@ interface Data {
     to: number;
     from: number;
   };
+  lobby: {
+    action:
+      | "create"
+      | "getLobbies"
+      | "join"
+      | "leave"
+      | "kick"
+      | "invite"
+      | "acceptInvite"
+      | "declineInvite";
+    lobbyID: string;
+    inviteID: string;
+    to: number;
+    from: number;
+    lobbies: Lobby[];
+  };
   userID?: number;
   userToken: string;
   users: number[];
+  lobbies: Lobby[];
 }
 
 export interface Packet {
@@ -55,6 +80,6 @@ export interface Packet {
     | "ping"
     | "getUsers"
     | "messageInfo"
-    | "createLobby";
+    | "lobby";
   data: Data;
 }

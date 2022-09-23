@@ -11,22 +11,10 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SnackbarAlert from "../components/SnackbarAlert";
-import { Alert } from "../types";
-import { RepeatOneSharp } from "@mui/icons-material";
+import { AppContext, AppContextType } from "../context/app";
 
 export default function Login() {
-  const [alert, setAlert] = useState<Alert>({
-    open: false,
-    type: "info",
-    message: "",
-  });
-
-  function closeAlert() {
-    setAlert((previousAlert) => ({
-      ...previousAlert,
-      open: false,
-    }));
-  }
+  const { fn } = React.useContext(AppContext) as AppContextType;
 
   const navigate = useNavigate();
 
@@ -48,28 +36,15 @@ export default function Login() {
       const data = await response.json();
 
       if (response.status === 401) {
-        setAlert({
-          open: true,
-          type: "error",
-          message: data.message,
-        });
+        fn.showAlert("error", data.message);
       } else if (response.status === 200) {
-        setAlert({
-          open: true,
-          type: "success",
-          message: data.message,
-        });
-
+        fn.showAlert("success", data.message);
         await localStorage.setItem("token", data.token);
         if (localStorage.getItem("token") !== "undefined") {
           navigate("/", { replace: true });
         }
       } else {
-        setAlert({
-          open: true,
-          type: "error",
-          message: `Unknown error ${response.status}`,
-        });
+        fn.showAlert("error", `Unknown error ${response.status}`);
       }
     } catch (error) {
       console.log(error);
@@ -95,7 +70,7 @@ export default function Login() {
           </Stack>
         </Grid>
       </Container>
-      <SnackbarAlert alert={alert} close={closeAlert} />
+      <SnackbarAlert />
     </Container>
   );
 }

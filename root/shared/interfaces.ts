@@ -16,9 +16,29 @@ export interface Data {
     to: number;
     from: number;
   };
+  lobby: {
+    action:
+      | "create"
+      | "getLobbies"
+      | "join"
+      | "leave"
+      | "kick"
+      | "invite"
+      | "acceptInvite"
+      | "declineInvite";
+    lobbyID: string;
+    inviteID: string;
+    to: number;
+    from: number;
+    lobbies: LobbyType[];
+  };
   userID?: number;
   userToken: string;
-  users: number[];
+  users: {
+    id: number;
+    lobby: string | null;
+    invites: Invite[] | null;
+  }[];
 }
 
 export interface Packet {
@@ -28,13 +48,17 @@ export interface Packet {
     | "message"
     | "ping"
     | "getUsers"
-    | "messageInfo";
+    | "messageInfo"
+    | "lobby";
   data: Data;
 }
 
-export interface ChatUser {
+export interface User {
   id: number;
-  messages: Message[];
+  messages: Message[] | undefined;
+  online: boolean;
+  lobby: string | null;
+  invites: Invite[] | null;
 }
 
 export interface LobbyType {
@@ -43,4 +67,11 @@ export interface LobbyType {
     id: number;
     leader: boolean;
   }[];
+}
+
+interface Invite {
+  id: string;
+  from: number;
+  to: number;
+  lobbyID: string;
 }

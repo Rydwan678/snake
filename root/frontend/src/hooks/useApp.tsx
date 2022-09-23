@@ -1,14 +1,14 @@
+import { FiberNew } from "@mui/icons-material";
 import React, { useState, useEffect, useRef } from "react";
-import { Packet, Message } from "../../../shared/interfaces";
+import { Packet, Message, User, LobbyType } from "../../../shared/interfaces";
 import { getMe } from "../ApiServices";
-import { Settings, Setting } from "../types";
+import { Settings, Setting, Alert, AlertType } from "../types";
 
 export default function useApp() {
-  const [users, setUsers] =
-    useState<
-      { id: number; messages: Message[] | undefined; online: boolean }[]
-    >();
+  const [users, setUsers] = useState<User[]>();
+  const [lobbies, setLobbies] = useState<LobbyType[] | null>(null);
   const [me, setMe] = useState<number>();
+  const [lobby, setLobby] = useState<LobbyType | null>(null);
   const [recipient, setRecipient] = useState<number>();
   const [settings, setSettings] = useState<Settings>({
     audio: true,
@@ -18,6 +18,13 @@ export default function useApp() {
       bricksPerLevel: 5,
     },
     gamemode: "",
+  });
+
+  const [alert, setAlert] = useState<Alert>({
+    open: false,
+    type: "info",
+    message: "",
+    inviteID: undefined,
   });
 
   const [pool, setPool] = useState<Packet[]>([]);
@@ -37,11 +44,18 @@ export default function useApp() {
       const packet = pool[0];
       if (packet) {
         if (packet?.packetId === "getUsers") {
+          console.log("getUsers", packet.data.users);
           if (users) {
             const updatedUsers = users?.map((user) => {
-              if (packet.data.users.includes(user.id)) {
+              const prevUser = packet.data.users.find(
+                (prevUser) => prevUser.id === user.id
+              );
+
+              if (prevUser) {
                 return {
                   ...user,
+                  invites: prevUser.invites,
+                  lobby: prevUser.lobby,
                   online: true,
                 };
               } else {
@@ -52,12 +66,14 @@ export default function useApp() {
               }
             });
 
-            packet.data.users.forEach((userID) => {
-              if (!users.find((user) => user.id === userID)) {
+            packet.data.users.forEach((prevUser) => {
+              if (!users.find((user) => user.id === prevUser.id)) {
                 updatedUsers.push({
-                  id: userID,
+                  id: prevUser.id,
                   messages: undefined,
                   online: true,
+                  lobby: prevUser.lobby,
+                  invites: prevUser.invites,
                 });
               }
             });
@@ -66,11 +82,20 @@ export default function useApp() {
           } else if (!users) {
             setUsers(
               packet.data.users.map((user) => ({
-                id: user,
+                id: user.id,
                 messages: undefined,
                 online: true,
+                lobby: user.lobby,
+                invites: user.invites,
               }))
             );
+          }
+        }
+
+        if (packet.packetId === "lobby") {
+          if (packet.data.lobby.action === "getLobbies") {
+            packet.data.lobby.lobbies &&
+              setLobbies([...packet.data.lobby.lobbies]);
           }
         }
 
@@ -83,7 +108,6 @@ export default function useApp() {
         }
 
         if (packet.packetId === "messageInfo") {
-          console.log("messageinfo");
           if (packet.data.messageInfo && users) {
             if (packet.data.messageInfo.info === "sent") {
               setMessageStatus(
@@ -131,18 +155,19 @@ export default function useApp() {
     webSocketConnection();
 
     const pingInterval = setInterval(() => {
-      if (ws.current?.readyState === 2 || ws.current?.readyState === 3) {
+      if (ws.current?.readyState === 1) {
+        ws.current?.send(
+          JSON.stringify({
+            module: "app",
+            packetId: "ping",
+            data: { userToken: localStorage.getItem("token") },
+          })
+        );
+      } else {
         console.log("Server is closed. Trying to reconnect");
         reconnect();
         return;
       }
-      ws.current?.send(
-        JSON.stringify({
-          module: "app",
-          packetId: "ping",
-          data: { userToken: localStorage.getItem("token") },
-        })
-      );
     }, 1000);
 
     const handlePacketInterval = setInterval(() => {
@@ -157,6 +182,7 @@ export default function useApp() {
   }, []);
 
   useEffect(() => {
+    console.log("useApp users", users);
     if (users && me && recipient === undefined) {
       const user = users.find((user) => user.id !== me);
       user && setRecipient(user.id);
@@ -168,6 +194,26 @@ export default function useApp() {
       sendReadStatus();
     }
   }, [recipient]);
+
+  useEffect(() => {
+    showInvite();
+  }, [alert && users]);
+
+  useEffect(() => {
+    if (users) {
+      const meIndex = users.findIndex((user) => user.id === me);
+
+      if (users[meIndex].lobby && lobbies) {
+        const myLobby = lobbies.find(
+          (lobby) => lobby.id === users[meIndex].lobby
+        );
+
+        myLobby && setLobby(myLobby);
+      } else {
+        setLobby(null);
+      }
+    }
+  }, [lobbies, users]);
 
   function connect() {
     ws.current?.send(
@@ -380,11 +426,205 @@ export default function useApp() {
     }));
   }
 
+  async function createLobby() {
+    try {
+      await ws.current?.send(
+        JSON.stringify({
+          module: "multiplayer",
+          packetId: "lobby",
+          data: {
+            lobby: {
+              action: "create",
+            },
+            userToken: localStorage.getItem("token"),
+          },
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getLobbies() {
+    try {
+      console.log("Sending getLobbies request 1", ws.current?.readyState);
+      await ws.current?.send(
+        JSON.stringify({
+          module: "multiplayer",
+          packetId: "lobby",
+          data: {
+            lobby: {
+              action: "getLobbies",
+            },
+            userToken: localStorage.getItem("token"),
+          },
+        })
+      );
+      console.log("Sending getLobbies request 2");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    console.log("lobbiesss", lobbies);
+  }, [lobbies]);
+
+  async function invite(lobbyID: string, userID: number) {
+    try {
+      await ws.current?.send(
+        JSON.stringify({
+          module: "multiplayer",
+          packetId: "lobby",
+          data: {
+            lobby: {
+              action: "invite",
+              lobbyID: lobbyID,
+              to: userID,
+            },
+            userToken: localStorage.getItem("token"),
+          },
+        })
+      );
+      showAlert("success", `Invite has been sent to user id ${userID}`);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function declineInvite(inviteID: string) {
+    try {
+      await ws.current?.send(
+        JSON.stringify({
+          module: "multiplayer",
+          packetId: "lobby",
+          data: {
+            lobby: {
+              action: "declineInvite",
+              inviteID: inviteID,
+            },
+            userToken: localStorage.getItem("token"),
+          },
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function acceptInvite(inviteID: string) {
+    try {
+      await ws.current?.send(
+        JSON.stringify({
+          module: "multiplayer",
+          packetId: "lobby",
+          data: {
+            lobby: {
+              action: "acceptInvite",
+              inviteID: inviteID,
+            },
+            userToken: localStorage.getItem("token"),
+          },
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function leaveLobby() {
+    try {
+      await ws.current?.send(
+        JSON.stringify({
+          module: "multiplayer",
+          packetId: "lobby",
+          data: {
+            lobby: {
+              action: "leave",
+            },
+            userToken: localStorage.getItem("token"),
+          },
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function kick(to: number) {
+    try {
+      await ws.current?.send(
+        JSON.stringify({
+          module: "multiplayer",
+          packetId: "lobby",
+          data: {
+            lobby: {
+              action: "kick",
+              lobbyID: lobby?.id,
+              to: to,
+            },
+            userToken: localStorage.getItem("token"),
+          },
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  function showInvite() {
+    if (users && !alert.open) {
+      const invites = users.find((user) => user.id === me)?.invites;
+
+      if (invites && invites[0]) {
+        showAlert("info", `Someone invited you to their lobby`, invites[0].id);
+      }
+    }
+  }
+
+  function showAlert(type: AlertType, message: string, inviteID?: string) {
+    if (inviteID) {
+      setAlert({
+        open: true,
+        type: type,
+        message: message,
+        inviteID: inviteID,
+      });
+    } else {
+      setAlert({
+        open: true,
+        type: type,
+        message: message,
+      });
+    }
+  }
+
+  const handleAlertClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    if (alert.inviteID) {
+      declineInvite(alert.inviteID);
+    }
+
+    setAlert((previousAlert) => ({
+      ...previousAlert,
+      open: false,
+    }));
+  };
+
   return {
     users: users,
+    lobbies: lobbies,
     me: me,
+    lobby: lobby,
     recipient: recipient,
     settings: settings,
+    alert: alert,
     fn: {
       sendMessage: sendMessage,
       changeRecipient: changeRecipient,
@@ -393,6 +633,14 @@ export default function useApp() {
       changeDifficulty: changeDifficulty,
       toggleSetting: toggleSetting,
       connect: connect,
+      createLobby: createLobby,
+      getLobbies: getLobbies,
+      invite: invite,
+      acceptInvite: acceptInvite,
+      leaveLobby: leaveLobby,
+      kick: kick,
+      showAlert: showAlert,
+      handleAlertClose: handleAlertClose,
     },
   };
 }

@@ -12,7 +12,7 @@ type SortingMode = "ASC" | "DESC";
 
 type OrderBy = "id" | "login" | "email" | "role";
 
-type AlertType = "error" | "warning" | "info" | "success";
+export type AlertType = "error" | "warning" | "info" | "success";
 
 interface Difficulty {
   name: string;
@@ -47,8 +47,9 @@ export interface Sorting {
 
 export interface Alert {
   open: boolean;
-  type: AlertType;
+  type?: AlertType;
   message: string;
+  inviteID?: string;
 }
 
 export interface Changes {

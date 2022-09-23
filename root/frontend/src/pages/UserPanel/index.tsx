@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Change, Changes, Alert } from "../../types";
+import { User, Change, Changes } from "../../types";
 import InfoCard from "./InfoCard";
 import SafetyCard from "./SafetyCard";
 import SettingsCard from "./SettingsCard";
@@ -11,16 +11,14 @@ import NavigationBar from "./NavigationBar";
 import SnackbarAlert from "../../components/SnackbarAlert";
 import { Grid, Box } from "@mui/material";
 import useValidateData from "../../hooks/useValidateData";
+import { AppContext, AppContextType } from "../../context/app";
 
 export default function UserPanel() {
   const [window, setWindow] = useState(0);
-  const [alert, setAlert] = useState<Alert>({
-    open: false,
-    type: "info",
-    message: "string",
-  });
   const [user, setUser] = useState<User | null>(null);
   const [changes, setChanges] = useState<Changes | null>(null);
+
+  const { fn } = React.useContext(AppContext) as AppContextType;
 
   const navigate = useNavigate();
   const validateUserData = useValidateData();
@@ -100,26 +98,11 @@ export default function UserPanel() {
         getUserData();
         setChanges(null);
 
-        setAlert({
-          open: true,
-          type: "success",
-          message: data.message,
-        });
+        fn.showAlert("success", data.message);
       } catch (error) {
-        setAlert({
-          open: true,
-          type: "error",
-          message: error as string,
-        });
+        fn.showAlert("error", error as string);
       }
     }
-  }
-
-  function closeAlert() {
-    setAlert((previousAlert) => ({
-      ...previousAlert,
-      open: false,
-    }));
   }
 
   return (
@@ -149,7 +132,7 @@ export default function UserPanel() {
           </Grid>
         </Grid>
       )}
-      <SnackbarAlert alert={alert} close={closeAlert} />
+      <SnackbarAlert />
     </Box>
   );
 }

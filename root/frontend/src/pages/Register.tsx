@@ -12,23 +12,12 @@ import {
   Paper,
 } from "@mui/material";
 import SnackbarAlert from "../components/SnackbarAlert";
-import { Alert } from "../types";
+import { AppContext, AppContextType } from "../context/app";
 
 export default function Register() {
-  const [alert, setAlert] = useState<Alert>({
-    open: false,
-    type: "info",
-    message: "",
-  });
+  const { fn } = React.useContext(AppContext) as AppContextType;
 
   const validateData = useValidateData();
-
-  function closeAlert() {
-    setAlert((previousAlert) => ({
-      ...previousAlert,
-      open: false,
-    }));
-  }
 
   async function registerUser(e: React.FormEvent<HTMLFormElement>) {
     try {
@@ -54,17 +43,9 @@ export default function Register() {
       });
       const data = await response.json();
 
-      setAlert({
-        open: true,
-        type: "success",
-        message: data.message,
-      });
+      fn.showAlert("success", data.message);
     } catch (error) {
-      setAlert({
-        open: true,
-        type: "error",
-        message: error as string,
-      });
+      fn.showAlert("error", error as string);
     }
   }
 
@@ -110,7 +91,7 @@ export default function Register() {
           </Stack>
         </Grid>
       </Container>
-      <SnackbarAlert alert={alert} close={closeAlert} />
+      <SnackbarAlert />
     </Container>
   );
 }

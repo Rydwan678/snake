@@ -1,13 +1,16 @@
 import React from "react";
 
-import { Message } from "../../../shared/interfaces";
-import { Settings, Setting } from "../types";
+import { LobbyType, User } from "../../../shared/interfaces";
+import { Settings, Setting, AlertType, Alert } from "../types";
 
 export interface AppContextType {
-  users: { id: number; messages: Message[] | undefined; online: boolean }[];
+  users: User[];
+  lobbies: LobbyType[];
   me: number | undefined;
+  lobby: LobbyType | null;
   recipient: number | undefined;
   settings: Settings;
+  alert: Alert;
   fn: {
     sendMessage: (content: string) => void;
     changeRecipient: (id: number) => void;
@@ -16,6 +19,14 @@ export interface AppContextType {
     changeDifficulty: () => void;
     toggleSetting: (setting: Setting) => void;
     connect: () => void;
+    createLobby: () => void;
+    getLobbies: () => void;
+    invite: (lobbyID: string, userID: number) => void;
+    acceptInvite: (inviteID: string) => void;
+    leaveLobby: () => void;
+    kick: (to: number) => void;
+    showAlert: (type: AlertType, message: string, inviteID?: string) => void;
+    handleAlertClose: () => void;
   };
 }
 

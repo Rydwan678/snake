@@ -13,6 +13,7 @@ import {
 import { User, TableType, Alert } from "../../types";
 import DeleteAlert from "./DeleteAlert";
 import SnackbarAlert from "../../components/SnackbarAlert";
+import { AppContext, AppContextType } from "../../context/app";
 
 function AdminPanel() {
   const [users, setUsers] = useState<User[]>([]);
@@ -25,14 +26,11 @@ function AdminPanel() {
     mode: "ASC",
   });
   const [searchBar, setSearchBar] = useState("");
-  const [alert, setAlert] = useState<Alert>({
-    open: false,
-    type: "info",
-    message: "",
-  });
-  const [deleteAlert, setDeleteAlert] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteAlert, setDeleteAlert] = useState(false);
+
+  const { fn } = React.useContext(AppContext) as AppContextType;
 
   useEffect(() => {
     setSelectedUsers(() => {
@@ -104,13 +102,13 @@ function AdminPanel() {
         }
       );
       const data = await response.json();
-      setAlert({
-        open: true,
-        type: "success",
-        message: `You successfully deleted ${selectedUsers.length} user${
-          selectedUsers.length > 1 ? "s" : ""
-        }`,
-      });
+
+      const message = `You successfully deleted ${selectedUsers.length} user${
+        selectedUsers.length > 1 ? "s" : ""
+      }`;
+
+      fn.showAlert("success", message);
+
       getUsers();
     } catch (error) {
       console.log("error", error);
@@ -119,11 +117,7 @@ function AdminPanel() {
 
   function confirmDelete() {
     if (selectedUsers.length < 1) {
-      setAlert({
-        open: true,
-        type: "error",
-        message: "You haven't selected any users",
-      });
+      fn.showAlert("error", "You haven't selected any users");
       return;
     } else {
       setDeleteAlert(true);
@@ -175,17 +169,10 @@ function AdminPanel() {
     }
   }
 
-  function closeSnackBar() {
-    setAlert((previousAlert) => ({
-      ...previousAlert,
-      open: false,
-    }));
-  }
-
   return (
     <ThemeProvider theme={theme}>
       <Grid sx={{ width: { sm: 700, md: 750 } }} component={Paper}>
-        <SnackbarAlert alert={alert} close={closeSnackBar} />
+        <SnackbarAlert />
         <DeleteAlert
           open={deleteAlert}
           close={() => setDeleteAlert(false)}

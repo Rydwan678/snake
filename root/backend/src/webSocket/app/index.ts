@@ -18,6 +18,6 @@ export default function app(
   }
 
   if (packet.packetId === "ping") {
-    userID && parse.ping(store, userID);
+    userID && parse.ping(store, userID, ws);
   }
 }

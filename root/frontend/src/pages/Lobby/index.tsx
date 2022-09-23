@@ -6,6 +6,7 @@ import OnlineUsers from "./OnlineUsers";
 import BottomBar from "./BottomBar";
 import { AppContext, AppContextType } from "../../context/app";
 import { LobbyType } from "../../../../shared/interfaces";
+import { getModeForResolutionAtIndex } from "typescript";
 
 function Lobby() {
   const [window, setWindow] = useState(0);
@@ -13,9 +14,11 @@ function Lobby() {
     setWindow(newWindow);
   };
 
-  const { me } = React.useContext(AppContext) as AppContextType;
+  const { me, lobby, fn } = React.useContext(AppContext) as AppContextType;
 
-  const [lobby, setLobby] = useState<LobbyType>();
+  useEffect(() => {
+    fn.getLobbies();
+  }, []);
 
   return (
     <Box sx={{ minWidth: 400, maxWidth: 750 }}>
@@ -23,8 +26,8 @@ function Lobby() {
         <Stack spacing={1}>
           <NavigationBar window={window} changeWindow={changeWindow} />
           {window === 0 && <UserLobby lobby={lobby} me={me} />}
-          {window === 1 && <OnlineUsers />}
-          {lobby && <BottomBar />}
+          {window === 1 && <OnlineUsers lobby={lobby} />}
+          {lobby && <BottomBar lobby={lobby} />}
         </Stack>
       )}
     </Box>

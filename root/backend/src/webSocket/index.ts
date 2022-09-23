@@ -5,6 +5,7 @@ import * as validate from "./validate";
 import chat from "./chat";
 import multiplayer from "./multiplayer";
 import app from "./app";
+import * as send from "./app/protocols/send";
 
 export function load(store: Store) {
   store.wsServer = new WebSocket.Server({ server: store.server });
@@ -13,7 +14,6 @@ export function load(store: Store) {
     await ws.on("message", (res) => {
       const packet: Packet = JSON.parse(res.toString());
       const userID = authorization(packet.data.userToken);
-
       if (packet.module === "app") {
         userID && app(packet, store, ws, userID);
       }
@@ -26,6 +26,8 @@ export function load(store: Store) {
         userID && multiplayer(packet, store, ws, userID);
       }
     });
+    send.usersForEveryone(store);
+    send.lobbiesForEveryone(store);
   });
 
   store.wsServer.on("close", () => {
@@ -33,7 +35,7 @@ export function load(store: Store) {
   });
 
   store.wsServer.on("message", () => {
-    console.log("pisze se");
+    console.log("message");
   });
 
   setInterval(() => {
