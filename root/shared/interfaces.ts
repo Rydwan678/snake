@@ -32,6 +32,12 @@ export interface Data {
     from: number;
     lobbies: LobbyType[];
   };
+  game: {
+    data: Game;
+    id: string;
+    lobbyID: string | null;
+    to: Direction;
+  };
   userID?: number;
   userToken: string;
   users: {
@@ -49,7 +55,10 @@ export interface Packet {
     | "ping"
     | "getUsers"
     | "messageInfo"
-    | "lobby";
+    | "lobby"
+    | "start"
+    | "move"
+    | "gameInfo";
   data: Data;
 }
 
@@ -74,4 +83,21 @@ interface Invite {
   from: number;
   to: number;
   lobbyID: string;
+}
+
+export type Direction = "right" | "left" | "up" | "down";
+
+export interface Game {
+  id: string;
+  users: {
+    id: number;
+    position: [number, number][];
+    direction: Direction;
+    score: number;
+  }[];
+  speed: number;
+  applePosition: [number, number];
+  bricksPosition: [number, number][];
+  isRunning: boolean;
+  isCounting: boolean;
 }

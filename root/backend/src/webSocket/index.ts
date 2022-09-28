@@ -3,9 +3,10 @@ import { Store, Packet } from "../interfaces";
 import authorization from "./authorization";
 import * as validate from "./validate";
 import chat from "./chat";
-import multiplayer from "./multiplayer";
+import game from "./game";
 import app from "./app";
 import * as send from "./app/protocols/send";
+import { processGames } from "./game/game";
 
 export function load(store: Store) {
   store.wsServer = new WebSocket.Server({ server: store.server });
@@ -21,9 +22,8 @@ export function load(store: Store) {
       if (packet.module === "chat") {
         userID && chat(packet, store, ws, userID);
       }
-
-      if (packet.module === "multiplayer") {
-        userID && multiplayer(packet, store, ws, userID);
+      if (packet.module === "game") {
+        userID && game(packet, store, ws, userID);
       }
     });
     send.usersForEveryone(store);
@@ -43,4 +43,8 @@ export function load(store: Store) {
       validate.ifUserDisconnected(store);
     }
   }, 500);
+
+  setInterval(() => {
+    processGames(store);
+  }, 1000);
 }

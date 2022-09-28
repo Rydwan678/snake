@@ -1,6 +1,5 @@
 import { nanoid } from "nanoid";
-import { format } from "path";
-import { Store } from "../../../interfaces";
+import { Store, Direction } from "../../../interfaces";
 import * as send from "../../app/protocols/send";
 
 export function createLobby(store: Store, userID: number) {
@@ -120,3 +119,98 @@ export function kick(
     console.log("User have no permission to kick users");
   }
 }
+
+export function start(store: Store, userID: number, lobbyID: string | null) {
+  console.log("Elo");
+
+  const gameID = nanoid();
+
+  if (!lobbyID) {
+    store.games.push({
+      id: gameID,
+      users: [
+        {
+          id: userID,
+          position: [
+            [192, 0],
+            [128, 0],
+            [64, 0],
+            [0, 0],
+          ],
+          direction: "right",
+          score: 0,
+        },
+      ],
+      speed: 250,
+      applePosition: [0, 0],
+      bricksPosition: [],
+      isRunning: true,
+      isCounting: true,
+    });
+
+    console.log(`Singleplayer game ${gameID} has started by user id ${userID}`);
+  } else if (lobbyID) {
+    const lobby = store.lobbies.findIndex((lobby) => lobby.id === lobbyID);
+
+    if (store.lobbies[lobby]) {
+      const user = store.lobbies[lobby].users.find(
+        (user) => user.id === userID
+      );
+
+      user &&
+        user.leader &&
+        store.games.push({
+          id: gameID,
+          users: [
+            {
+              id: store.lobbies[lobby].users[0].id,
+              position: [
+                [192, 0],
+                [128, 0],
+                [64, 0],
+                [0, 0],
+              ],
+              direction: "right",
+              score: 0,
+            },
+            {
+              id: store.lobbies[lobby].users[1].id,
+              position: [
+                [768, 960],
+                [832, 960],
+                [896, 960],
+                [960, 960],
+              ],
+              direction: "left",
+              score: 0,
+            },
+          ],
+          speed: 250,
+          applePosition: [0, 0],
+          bricksPosition: [],
+          isRunning: true,
+          isCounting: true,
+        });
+    }
+
+    console.log(`Multiplayer game ${gameID} has started by user id ${userID}`);
+  }
+}
+
+export const move = (
+  store: Store,
+  userID: number,
+  gameID: string,
+  to: Direction
+) => {
+  const game = store.games.findIndex((game) => game.id === gameID);
+
+  if (store.games[game]) {
+    const user = store.games[game].users.findIndex(
+      (user) => user.id === userID
+    );
+
+    store.games[game].users[user].direction = to;
+    send.game(store, gameID);
+  }
+};

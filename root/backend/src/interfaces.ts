@@ -31,7 +31,24 @@ export interface Store {
   wsServer?: WebSocket.Server;
   users: User[];
   lobbies: Lobby[];
-  games: [];
+  games: Game[];
+}
+
+export type Direction = "left" | "right" | "up" | "down";
+
+interface Game {
+  id: string;
+  users: {
+    id: number;
+    position: [number, number][];
+    direction: Direction;
+    score: number;
+  }[];
+  speed: number;
+  applePosition: [number, number];
+  bricksPosition: [number, number][];
+  isRunning: boolean;
+  isCounting: boolean;
 }
 
 interface Message {
@@ -65,6 +82,12 @@ interface Data {
     from: number;
     lobbies: Lobby[];
   };
+  game: {
+    id: string;
+    data: Game;
+    lobbyID: string | null;
+    to: Direction;
+  };
   userID?: number;
   userToken: string;
   users: number[];
@@ -72,7 +95,7 @@ interface Data {
 }
 
 export interface Packet {
-  module: "app" | "chat" | "multiplayer";
+  module: "app" | "chat" | "game";
   packetId:
     | "connect"
     | "reconnect"
@@ -80,6 +103,8 @@ export interface Packet {
     | "ping"
     | "getUsers"
     | "messageInfo"
-    | "lobby";
+    | "lobby"
+    | "start"
+    | "move";
   data: Data;
 }

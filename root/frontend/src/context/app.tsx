@@ -1,6 +1,6 @@
 import React from "react";
 
-import { LobbyType, User } from "../../../shared/interfaces";
+import { LobbyType, User, Game } from "../../../shared/interfaces";
 import { Settings, Setting, AlertType, Alert } from "../types";
 
 export interface AppContextType {
@@ -10,6 +10,7 @@ export interface AppContextType {
   lobby: LobbyType | null;
   recipient: number | undefined;
   settings: Settings;
+  game: Game;
   alert: Alert;
   fn: {
     sendMessage: (content: string) => void;
@@ -27,6 +28,8 @@ export interface AppContextType {
     kick: (to: number) => void;
     showAlert: (type: AlertType, message: string, inviteID?: string) => void;
     handleAlertClose: () => void;
+    startGame: (mode: "singleplayer" | "multiplayer") => void;
+    changeDirection: (e: React.KeyboardEvent) => void;
   };
 }
 

@@ -12,13 +12,14 @@ export default function Play() {
         <Link to="/game">
           <Button
             onClick={() => {
-              fn.changeGamemode("classicSnake");
+              fn.startGame("singleplayer");
             }}
             variant="contained"
           >
             Classic Snake
           </Button>
         </Link>
+
         <Link to="/game">
           <Button
             onClick={() => {

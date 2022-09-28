@@ -67,3 +67,22 @@ export function lobbiesForEveryone(store: Store) {
     )
   );
 }
+
+export function game(store: Store, gameID: string) {
+  const game = store.games.findIndex((game) => game.id === gameID);
+
+  store.games[game].users.forEach((player) =>
+    store.users
+      .find((user) => user.id === player.id)
+      ?.ws.send(
+        JSON.stringify({
+          packetId: "gameInfo",
+          data: {
+            game: {
+              data: store.games[game],
+            },
+          },
+        })
+      )
+  );
+}

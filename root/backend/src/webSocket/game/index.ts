@@ -4,7 +4,7 @@ import * as parse from "./protocols/parse";
 import * as send from "./protocols/send";
 import { lobbies } from "../app/protocols/send";
 
-export default function multiplayer(
+export default function game(
   packet: Packet,
   store: Store,
   ws: WebSocket.WebSocket,
@@ -36,5 +36,9 @@ export default function multiplayer(
         packet.data.lobby.to
       );
     }
+  } else if (packet.packetId === "start") {
+    parse.start(store, userID, packet.data.game.lobbyID);
+  } else if (packet.packetId === "move") {
+    parse.move(store, userID, packet.data.game.id, packet.data.game.to);
   }
 }

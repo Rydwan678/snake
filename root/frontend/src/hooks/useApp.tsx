@@ -1,6 +1,13 @@
 import { FiberNew } from "@mui/icons-material";
 import React, { useState, useEffect, useRef } from "react";
-import { Packet, Message, User, LobbyType } from "../../../shared/interfaces";
+import {
+  Packet,
+  Message,
+  User,
+  LobbyType,
+  Game,
+  Direction,
+} from "../../../shared/interfaces";
 import { getMe } from "../ApiServices";
 import { Settings, Setting, Alert, AlertType } from "../types";
 
@@ -19,6 +26,8 @@ export default function useApp() {
     },
     gamemode: "",
   });
+
+  const [game, setGame] = useState<Game | null>(null);
 
   const [alert, setAlert] = useState<Alert>({
     open: false,
@@ -97,6 +106,10 @@ export default function useApp() {
             packet.data.lobby.lobbies &&
               setLobbies([...packet.data.lobby.lobbies]);
           }
+        }
+
+        if (packet.packetId === "gameInfo") {
+          setGame(packet.data.game.data);
         }
 
         if (packet?.packetId === "message") {
@@ -430,7 +443,7 @@ export default function useApp() {
     try {
       await ws.current?.send(
         JSON.stringify({
-          module: "multiplayer",
+          module: "game",
           packetId: "lobby",
           data: {
             lobby: {
@@ -450,7 +463,7 @@ export default function useApp() {
       console.log("Sending getLobbies request 1", ws.current?.readyState);
       await ws.current?.send(
         JSON.stringify({
-          module: "multiplayer",
+          module: "game",
           packetId: "lobby",
           data: {
             lobby: {
@@ -474,7 +487,7 @@ export default function useApp() {
     try {
       await ws.current?.send(
         JSON.stringify({
-          module: "multiplayer",
+          module: "game",
           packetId: "lobby",
           data: {
             lobby: {
@@ -496,7 +509,7 @@ export default function useApp() {
     try {
       await ws.current?.send(
         JSON.stringify({
-          module: "multiplayer",
+          module: "game",
           packetId: "lobby",
           data: {
             lobby: {
@@ -516,7 +529,7 @@ export default function useApp() {
     try {
       await ws.current?.send(
         JSON.stringify({
-          module: "multiplayer",
+          module: "game",
           packetId: "lobby",
           data: {
             lobby: {
@@ -536,7 +549,7 @@ export default function useApp() {
     try {
       await ws.current?.send(
         JSON.stringify({
-          module: "multiplayer",
+          module: "game",
           packetId: "lobby",
           data: {
             lobby: {
@@ -555,7 +568,7 @@ export default function useApp() {
     try {
       await ws.current?.send(
         JSON.stringify({
-          module: "multiplayer",
+          module: "game",
           packetId: "lobby",
           data: {
             lobby: {
@@ -579,6 +592,79 @@ export default function useApp() {
       if (invites && invites[0]) {
         showAlert("info", `Someone invited you to their lobby`, invites[0].id);
       }
+    }
+  }
+
+  async function startGame() {
+    console.log("startwr", lobby ? lobby.id : null);
+    try {
+      await ws.current?.send(
+        JSON.stringify({
+          module: "game",
+          packetId: "start",
+          data: {
+            game: {
+              lobbyID: lobby ? lobby.id : null,
+            },
+            userToken: localStorage.getItem("token"),
+          },
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function changeDirection(e: React.KeyboardEvent) {
+    if (game) {
+      let direction = game.users.find((user) => user.id === me)?.direction;
+
+      if (direction) {
+        if (e.key === "w") {
+          if (direction !== "down") {
+            direction = "up";
+          }
+        } else if (e.key === "s") {
+          if (direction !== "up") {
+            direction = "down";
+          }
+        } else if (e.key === "a") {
+          if (direction !== "right") {
+            direction = "left";
+          }
+        } else if (e.key === "d") {
+          if (direction !== "left") {
+            direction = "right";
+          }
+        }
+
+        try {
+          await ws.current?.send(
+            JSON.stringify({
+              module: "game",
+              packetId: "move",
+              data: {
+                game: {
+                  id: game.id,
+                  to: direction,
+                },
+                userToken: localStorage.getItem("token"),
+              },
+            })
+          );
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+      // if (e.key === "Escape") {
+      //   console.log("test");
+      //   gameDataRef.current.isRunning = !gameDataRef.current.isRunning;
+      //   gameDataRef.current.popup = {
+      //     isShown: !gameDataRef.current.popup.isShown,
+      //     type: "gamePaused",
+      //   };
+      // }
     }
   }
 
@@ -624,6 +710,7 @@ export default function useApp() {
     lobby: lobby,
     recipient: recipient,
     settings: settings,
+    game: game,
     alert: alert,
     fn: {
       sendMessage: sendMessage,
@@ -641,6 +728,8 @@ export default function useApp() {
       kick: kick,
       showAlert: showAlert,
       handleAlertClose: handleAlertClose,
+      startGame: startGame,
+      changeDirection: changeDirection,
     },
   };
 }

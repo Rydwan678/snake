@@ -18,7 +18,11 @@ function BottomBar(props: BottomBarProps) {
           <Button variant="contained" onClick={fn.leaveLobby}>
             Leave
           </Button>
-          <Button variant="contained" disabled={props.lobby.users.length < 2}>
+          <Button
+            variant="contained"
+            disabled={props.lobby.users.length < 2}
+            onClick={() => fn.startGame("multiplayer")}
+          >
             Start
           </Button>
         </Stack>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useContext } from "react";
 import GameField from "./GameField";
 
 export default function GameSite() {
