@@ -6,7 +6,7 @@ export default function authorization(token: string) {
 
   jwt.verify(token, ACCESS_TOKEN, (err: any, user: any) => {
     if (err) {
-      throw "Token is not valid";
+      return "Token is not valid";
     }
     userID = user.id;
   });

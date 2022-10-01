@@ -24,7 +24,7 @@ export async function registerController(req: { body: Register }, res: any) {
   try {
     await authenticateRegister(user);
     await pool.query(
-      `INSERT INTO users (login, email, password) VALUES ('${user.login}', '${user.email}', '${user.password}')`
+      `INSERT INTO users (login, firstname, lastname, email, password, role) VALUES ('${user.login}', '${user.firstName}', '${user.lastName}', '${user.email}', '${user.password}', 'user')`
     );
     res.status(200).json({ message: "Account created successfully" });
   } catch (error: any) {

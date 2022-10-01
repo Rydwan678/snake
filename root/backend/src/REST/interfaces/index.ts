@@ -2,8 +2,11 @@ import { TableType, SortingMode, OrderBy } from "./types";
 
 export interface Register {
   login: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
+  role: "user" | "admin";
 }
 
 export interface Login {
