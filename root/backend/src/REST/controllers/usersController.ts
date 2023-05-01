@@ -30,9 +30,9 @@ export async function getAll(req: any, res: any) {
   }
 }
 
-export async function getMe(req: { body: { id: number } }, res: any) {
+export async function getMe(req: { body: { user: { id: number } } }, res: any) {
   try {
-    const user = await getUsers([req.body.id]);
+    const user = await getUsers([req.body.user.id]);
     res.status(200).json({ user: user });
   } catch (error) {
     res.status(502).json({ message: error });
@@ -41,12 +41,13 @@ export async function getMe(req: { body: { id: number } }, res: any) {
 }
 
 export async function update(
-  req: { body: { changes: UpdateUserData; userID: number } },
+  req: { body: { changes: UpdateUserData }; params: { id: string } },
   res: any
 ) {
+  const userID = parseInt(req.params.id);
   try {
     for (const [key, value] of Object.entries(req.body.changes)) {
-      await updateUser(key as Change, value, req.body.userID);
+      await updateUser(key as Change, value, userID);
     }
     res.status(200).json({ message: "Changes have been saved" });
   } catch (error) {

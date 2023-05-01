@@ -24,6 +24,10 @@ export default function UserPanel() {
   const validateUserData = useValidateData();
 
   useEffect(() => {
+    console.log(changes);
+  }, [changes]);
+
+  useEffect(() => {
     getUserData();
   }, []);
 
@@ -83,14 +87,15 @@ export default function UserPanel() {
 
   async function saveChanges() {
     if (user && changes) {
-      const userID = user.id;
       try {
         changes && (await validateUserData(changes));
-        const response = await fetch("http://127.0.0.1:8080/updateUser", {
-          method: "POST",
-          body: JSON.stringify({ changes, userID }),
+
+        const response = await fetch(`http://127.0.0.1:8080/users/${user.id}`, {
+          method: "PATCH",
+          body: JSON.stringify({ changes }),
           headers: {
             "Content-type": "application/json",
+            authorization: `Beaer ${localStorage.getItem("token")}`,
           },
         });
 

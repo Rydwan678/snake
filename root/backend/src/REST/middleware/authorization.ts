@@ -9,6 +9,7 @@ export default function authorization(
 ) {
   const authorizationHeader = req.headers["authorization"];
   const token = authorizationHeader && authorizationHeader.split(" ")[1];
+  const body = req.body;
 
   if (!token) {
     return res.sendStatus(401);
@@ -18,7 +19,8 @@ export default function authorization(
     if (err) {
       return res.sendStatus(403);
     }
-    req.body = user;
+    req.body = { user, ...body };
+    console.log("AUTORHIZATION", req.body);
     next();
   });
 }
