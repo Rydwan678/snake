@@ -1,51 +1,75 @@
 import React, { useEffect, useRef } from "react";
 import { Settings } from "../../types";
-import { Link } from "react-router-dom";
-
+import { AppContext, AppContextType } from "../../context/app";
+import {
+  Grid,
+  Button,
+  Stack,
+  Typography,
+  createTheme,
+  ThemeProvider,
+  Fade,
+} from "@mui/material";
 interface PopupProps {
-  type: string;
-  level: number;
   settings: Settings;
-  score: number;
   bestScore: number | null;
-  startGame: () => void;
-  setNewLevel: () => void;
-  handleKeyDown: (e: React.KeyboardEvent) => void;
 }
 
 export default function Popup(props: PopupProps) {
-  type Styles = {
-    background: string;
-    boxShadow: string;
-  };
+  const { fn, game, popup } = React.useContext(AppContext) as AppContextType;
 
-  const styles: Styles = {
-    background: "",
+  let styles = {
+    backgroundColor: "",
     boxShadow: "",
   };
 
-  if (props.type === "win") {
-    styles.background = "linear-gradient(90deg, #fcff9e 0%, #c67700 100%)";
-    styles.boxShadow = "4px 4px 15px #ff9900";
+  switch (popup.type) {
+    case "win":
+      styles.backgroundColor =
+        "linear-gradient(90deg, #fcff9e 0%, #c67700 100%)";
+      styles.boxShadow = "4px 4px 15px #ff9900";
+      break;
+    case "lose":
+      styles.backgroundColor =
+        "linear-gradient(90deg, #EB3349 0%, #F45C43 51%, #EB3349  100%)";
+      styles.boxShadow = "4px 4px 15px #ed5568";
+      break;
+    case "pause":
+      styles.backgroundColor =
+        "linear-gradient(90deg, #9ebd13 0%, #008552 100%)";
+      styles.boxShadow = "1px 1px 15px  #bbe014";
+      break;
+    case "level":
+      styles.backgroundColor =
+        "linear-gradient(90deg, #1CB5E0 0%, #2e70ff 100%)";
+      styles.boxShadow = "1px 1px 15px  #1CB5E0";
+      break;
+    default:
+      styles.backgroundColor = "#FFFFFF"; // Default color
+      styles.boxShadow = "#FFFFFF"; // Default color
   }
-  if (props.type === "lose") {
-    styles.background =
-      "linear-gradient(90deg, #EB3349 0%, #F45C43 51%, #EB3349  100%)";
-    styles.boxShadow = "4px 4px 15px #ed5568";
-  }
-  if (props.type === "end") {
-    styles.background =
-      "linear-gradient(to right, #757F9A 0%, #D7DDE8  51%, #757F9A  100%)";
-    styles.boxShadow = "4px 4px 15px #D7DDE8";
-  }
-  if (props.type === "gamePaused") {
-    styles.background = "linear-gradient(90deg, #9ebd13 0%, #008552 100%)";
-    styles.boxShadow = "1px 1px 15px  #bbe014";
-  }
-  if (props.type === "nextLevel") {
-    styles.background = "linear-gradient(90deg, #1CB5E0 0%, #2e70ff 100%)";
-    styles.boxShadow = "1px 1px 15px  #1CB5E0";
-  }
+
+  const theme = createTheme({
+    components: {
+      MuiGrid: {
+        styleOverrides: {
+          root: {
+            background: styles.backgroundColor,
+            boxShadow: styles.boxShadow,
+          },
+        },
+      },
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            background: styles.backgroundColor,
+            boxShadow: styles.boxShadow,
+            color: "white",
+          },
+        },
+      },
+    },
+  });
 
   const focusRef = useRef<HTMLDivElement>(null);
 
@@ -53,114 +77,64 @@ export default function Popup(props: PopupProps) {
     focusRef.current && focusRef.current.focus();
   }, []);
 
-  if (props.type === "nextLevel") {
-    return (
-      <div ref={focusRef} tabIndex={1} className="popup-body">
-        <div className="popup" style={styles}>
-          <p>LEVEL {props.level} COMPLETED</p>
-          <div>
-            <button style={styles} onClick={props.setNewLevel}>
-              NEXT LEVEL
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  return (
+    <ThemeProvider theme={theme}>
+      <Fade in={true} timeout={1000}>
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          sx={{
+            position: "absolute",
+            height: "100%",
+            width: "100%",
+            background: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <Grid sx={{ position: "absolute", padding: 5 }}>
+            <Stack spacing={2}>
+              {popup.type === "win" && (
+                <Typography variant="h3">YOU WON</Typography>
+              )}
+              {popup.type === "lose" && (
+                <Typography variant="h3">YOU LOST</Typography>
+              )}
+              {popup.type === "pause" && (
+                <Typography variant="h3">GAME PAUSED</Typography>
+              )}
+              {popup.type === "level" && (
+                <Typography variant="h3">LEVEL COMPLETED</Typography>
+              )}
 
-  if (props.type === "gamePaused")
-    return (
-      <div
-        ref={focusRef}
-        tabIndex={1}
-        className="popup-body"
-        onKeyDown={(e) => {
-          props.handleKeyDown(e);
-        }}
-      >
-        <div className="popup" style={styles}>
-          <p>GAME PAUSED</p>
-
-          <div>
-            <button style={styles} onClick={props.startGame}>
-              RESTART
-            </button>
-            <Link to="/">
-              <button style={styles}>BACK TO MENU</button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-
-  if (props.type === "lose")
-    return (
-      <div className="popup-body" ref={focusRef} tabIndex={1}>
-        <div className="popup" style={styles}>
-          <p>YOU LOST</p>
-
-          <div>
-            <button style={styles} onClick={props.startGame}>
-              PLAY AGAIN
-            </button>
-            <Link to="/">
-              <button style={styles}>BACK TO MENU</button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-
-  if (props.type === "end") {
-    return (
-      <div className="popup-body" ref={focusRef} tabIndex={1}>
-        <div className="popup" style={styles}>
-          <div className="game-info">
-            <img
-              alt="apple"
-              src="textures/apple.png"
-              className="apple-icon"
-            ></img>
-            <h1>{props.score}</h1>
-            {props.bestScore && (
-              <img
-                alt="trophy"
-                src="textures/trophy.png"
-                className="trophy-icon"
-              ></img>
-            )}
-            {props.bestScore && <h1>{props.bestScore}</h1>}
-          </div>
-          <div>
-            <button style={styles} onClick={props.startGame}>
-              PLAY AGAIN
-            </button>
-            <Link to="/">
-              <button style={styles}>BACK TO MENU</button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (props.type === "win") {
-    return (
-      <div className="popup-body" ref={focusRef} tabIndex={1}>
-        <div className="popup" style={styles}>
-          <p>YOU WON</p>
-
-          <div>
-            <button style={styles} onClick={props.startGame}>
-              PLAY AGAIN
-            </button>
-            <Link to="/">
-              <button style={styles}>BACK TO MENU</button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  return null;
+              <Stack direction="row" spacing={2}>
+                {game.mode !== "pvp" ? (
+                  <Button
+                    onClick={() => {
+                      fn.startGame(game.mode);
+                      fn.leaveGame();
+                    }}
+                  >
+                    PLAY AGAIN
+                  </Button>
+                ) : (
+                  <Button href="/lobby" onClick={() => fn.leaveGame()}>
+                    BACK TO LOBBY
+                  </Button>
+                )}
+                {(popup.type === "win" || popup.type === "lose") && (
+                  <Button href="/" onClick={() => fn.leaveGame()}>
+                    BACK TO MENU
+                  </Button>
+                )}
+                {popup.type === "pause" && <Button>RESUME</Button>}
+                {popup.type === "level" && (
+                  <Button onClick={() => fn.nextLevel()}>NEXT LEVEL</Button>
+                )}
+              </Stack>
+            </Stack>
+          </Grid>
+        </Grid>
+      </Fade>
+    </ThemeProvider>
+  );
 }

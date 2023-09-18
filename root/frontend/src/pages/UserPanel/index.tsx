@@ -9,7 +9,7 @@ import UserCard from "../../components/UserCard";
 import BottomBar from "./BottomBar";
 import NavigationBar from "./NavigationBar";
 import SnackbarAlert from "../../components/SnackbarAlert";
-import { Grid, Box } from "@mui/material";
+import { Grid, Box, Fade } from "@mui/material";
 import useValidateData from "../../hooks/useValidateData";
 import { AppContext, AppContextType } from "../../context/app";
 
@@ -113,29 +113,35 @@ export default function UserPanel() {
   return (
     <Box sx={{ maxWidth: "750px" }}>
       {user && (
-        <Grid container spacing={1}>
-          <Grid item xs={12} sm={12}>
-            <NavigationBar window={window} changeWindow={changeWindow} />
+        <Fade in timeout={600}>
+          <Grid container spacing={1}>
+            <Grid item xs={12} sm={12}>
+              <NavigationBar window={window} changeWindow={changeWindow} />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <UserCard user={user} type="userPanel" />
+            </Grid>
+            <Grid item xs={12} sm={8}>
+              {window === 0 && (
+                <InfoCard
+                  getChanges={getChanges}
+                  changes={changes}
+                  user={user}
+                />
+              )}
+              {window === 1 && <SafetyCard />}
+              {window === 2 && <SettingsCard />}
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <BottomBar
+                logout={logout}
+                saveChanges={saveChanges}
+                cancelChanges={() => setChanges(null)}
+                changes={changes}
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={4}>
-            <UserCard user={user} type="userPanel" />
-          </Grid>
-          <Grid item xs={12} sm={8}>
-            {window === 0 && (
-              <InfoCard getChanges={getChanges} changes={changes} user={user} />
-            )}
-            {window === 1 && <SafetyCard />}
-            {window === 2 && <SettingsCard />}
-          </Grid>
-          <Grid item xs={12} sm={12}>
-            <BottomBar
-              logout={logout}
-              saveChanges={saveChanges}
-              cancelChanges={() => setChanges(null)}
-              changes={changes}
-            />
-          </Grid>
-        </Grid>
+        </Fade>
       )}
       <SnackbarAlert />
     </Box>

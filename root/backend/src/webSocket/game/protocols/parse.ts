@@ -1,6 +1,7 @@
 import { nanoid } from "nanoid";
-import { Store, Direction } from "../../../interfaces";
+import { Store, Direction, Gamemode } from "../../../interfaces";
 import * as send from "../../app/protocols/send";
+import { setBricks, setApple } from "../game";
 
 export function createLobby(store: Store, userID: number) {
   const lobbyID = nanoid();
@@ -120,14 +121,18 @@ export function kick(
   }
 }
 
-export function start(store: Store, userID: number, lobbyID: string | null) {
-  console.log("Elo");
-
+export function start(
+  store: Store,
+  userID: number,
+  lobbyID: string | null,
+  mode: Gamemode
+) {
   const gameID = nanoid();
 
-  if (!lobbyID) {
+  if (mode === "classic" || mode === "bricks") {
     store.games.push({
       id: gameID,
+      mode: mode,
       users: [
         {
           id: userID,
@@ -139,17 +144,25 @@ export function start(store: Store, userID: number, lobbyID: string | null) {
           ],
           direction: "right",
           score: 0,
+          speed: 250,
         },
       ],
-      speed: 250,
+      level: 1,
       applePosition: [0, 0],
       bricksPosition: [],
       isRunning: true,
       isCounting: true,
+      winner: undefined,
+      loser: undefined,
     });
 
-    console.log(`Singleplayer game ${gameID} has started by user id ${userID}`);
-  } else if (lobbyID) {
+    setApple(store, gameID);
+    setBricks(store, gameID);
+
+    console.log(
+      `Singleplayer ${mode} game ${gameID} has been started by user id ${userID}`
+    );
+  } else if (mode === "pvp") {
     const lobby = store.lobbies.findIndex((lobby) => lobby.id === lobbyID);
 
     if (store.lobbies[lobby]) {
@@ -161,6 +174,7 @@ export function start(store: Store, userID: number, lobbyID: string | null) {
         user.leader &&
         store.games.push({
           id: gameID,
+          mode: mode,
           users: [
             {
               id: store.lobbies[lobby].users[0].id,
@@ -172,6 +186,7 @@ export function start(store: Store, userID: number, lobbyID: string | null) {
               ],
               direction: "right",
               score: 0,
+              speed: 250,
             },
             {
               id: store.lobbies[lobby].users[1].id,
@@ -183,23 +198,68 @@ export function start(store: Store, userID: number, lobbyID: string | null) {
               ],
               direction: "left",
               score: 0,
+              speed: 250,
             },
           ],
-          speed: 250,
+
+          level: 1,
+
           applePosition: [0, 0],
           bricksPosition: [],
           isRunning: true,
           isCounting: true,
+          winner: undefined,
+          loser: undefined,
         });
     }
 
     console.log(`Multiplayer game ${gameID} has started by user id ${userID}`);
+  } else if (mode === "pve") {
+    store.games.push({
+      id: gameID,
+      mode: mode,
+      users: [
+        {
+          id: userID,
+          position: [
+            [192, 0],
+            [128, 0],
+            [64, 0],
+            [0, 0],
+          ],
+          direction: "right",
+          score: 0,
+          speed: 250,
+        },
+        {
+          id: "env",
+          position: [
+            [768, 960],
+            [832, 960],
+            [896, 960],
+            [960, 960],
+          ],
+          direction: "left",
+          score: 0,
+          speed: 250,
+        },
+      ],
+
+      level: 1,
+      applePosition: [0, 0],
+      bricksPosition: [],
+      isRunning: true,
+      isCounting: true,
+      winner: undefined,
+      loser: undefined,
+    });
+    console.log("pve game started with id", gameID);
   }
 }
 
-export const move = (
+export const changeDirection = (
   store: Store,
-  userID: number,
+  userID: number | "env",
   gameID: string,
   to: Direction
 ) => {
@@ -210,7 +270,90 @@ export const move = (
       (user) => user.id === userID
     );
 
-    store.games[game].users[user].direction = to;
+    if (userID === "env") {
+      getRandomDirection(store, game);
+    } else {
+      store.games[game].users[user].direction = to;
+    }
+
     send.game(store, gameID);
   }
+};
+
+const getRandomDirection = (store: Store, game: number) => {
+  const env = store.games[game].users.findIndex((user) => user.id === "env");
+  if (env) {
+    const randomNumber = Math.floor(Math.random() * 3);
+    const directions: Direction[] = ["left", "right", "up", "down"];
+
+    const currentDirection = store.games[game].users[env].direction;
+    const newDirection = directions[randomNumber];
+    if (currentDirection === "left" && newDirection === "right") {
+      getRandomDirection(store, game);
+    } else if (currentDirection === "right" && newDirection === "left") {
+      getRandomDirection(store, game);
+    } else if (currentDirection === "up" && newDirection === "down") {
+      getRandomDirection(store, game);
+    } else if (currentDirection === "down" && newDirection === "up") {
+      getRandomDirection(store, game);
+    } else {
+      store.games[game].users[env].direction = newDirection;
+    }
+  }
+};
+
+export const pause = (store: Store, userID: number, gameID: string) => {
+  const game = store.games.findIndex((game) => game.id === gameID);
+
+  if (store.games[game]) {
+    store.games[game].isRunning = !store.games[game].isRunning;
+    send.game(store, gameID);
+  }
+};
+
+export const leaveGame = (store: Store, userID: number, gameID: string) => {
+  const userIndex = store.users.findIndex((user) => user.id === userID);
+  const gameIndex = store.games.findIndex((game) => game.id === gameID);
+
+  if (store.games[gameIndex]) {
+    store.games[gameIndex].users = store.games[gameIndex].users.filter(
+      (user) => user.id !== userID
+    );
+
+    console.log(`User ${userID} successfully leaved game ${gameID}`);
+
+    const users = store.games[gameIndex].users;
+
+    if (users.length === 0 || (users.length === 1 && users[0].id === "env")) {
+      store.games = store.games.filter((game) => game.id !== gameID);
+      console.log(`Game ${gameID} deleted. Games left: ${store.games.length}`);
+    }
+  }
+};
+
+export const setNewLevel = (store: Store, gameID: string) => {
+  const game = store.games.find((game) => game.id === gameID);
+  const gameIndex = store.games.findIndex((game) => game.id === gameID);
+
+  const speedPerLevel = 20;
+
+  if (game) {
+    if (game.level < 9) {
+      store.games[gameIndex].level += 1;
+      store.games[gameIndex].users[0] = {
+        ...game.users[0],
+        position: [
+          [192, 0],
+          [128, 0],
+          [64, 0],
+          [0, 0],
+        ],
+        direction: "right",
+        speed: game.users[0].speed - speedPerLevel,
+      };
+      store.games[gameIndex].isRunning = true;
+    }
+  }
+  setBricks(store, gameID);
+  setApple(store, gameID);
 };

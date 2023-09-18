@@ -1,3 +1,5 @@
+import { Gamemode } from "../frontend/src/types";
+
 export interface Message {
   id: number;
   to: number;
@@ -89,6 +91,7 @@ export type Direction = "right" | "left" | "up" | "down";
 
 export interface Game {
   id: string;
+  mode: Gamemode;
   users: {
     id: number;
     position: [number, number][];
@@ -96,8 +99,12 @@ export interface Game {
     score: number;
   }[];
   speed: number;
+  score: number;
+  level: number;
   applePosition: [number, number];
   bricksPosition: [number, number][];
   isRunning: boolean;
   isCounting: boolean;
+  winner: undefined | number;
+  loser: undefined | number;
 }

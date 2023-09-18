@@ -6,17 +6,19 @@ body * {
 
 body {
   height: 100vh;
+  width: 100vw;
   display: flex;
   justify-content: center;
-  background-image: url("../public/textures/background.jpg");
-
   color: rgb(255, 255, 255);
+  background-image: url("../public/textures/background.jpg");
+  backdrop-filter: blur(10px);
   margin: 0%;
   padding: 0%;
 }
 
 main {
   height: 100vh;
+  width: 100vw;
   display: flex;
   flex-flow: column;
   align-items: center;
@@ -26,14 +28,19 @@ main {
 #root {
   display: flex;
   align-items: center;
+  height: 100%;
+  width: 100%;
 }
 
-.app {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  width: 100vw;
+#overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #1a1721;
+  opacity: 0.95;
+  z-index: -1;
 }
 
 .game-title {

@@ -15,17 +15,17 @@ export default function GameField() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const focusRef = useRef<HTMLInputElement>(null);
 
-  const { settings, game, me, fn } = React.useContext(
+  const { settings, game, me, fn, popup } = React.useContext(
     AppContext
   ) as AppContextType;
+
+  useEffect(() => {
+    console.log("game", game);
+  }, [game]);
 
   const [score, setScore] = useState<number | null>(null);
   const [level, setLevel] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
-  const [popup, setPopup] = useState({
-    isShown: false,
-    type: "",
-  });
   const [isCounting, setIsCounting] = useState(true);
   const [bestScore, setBestScore] = useState<number | null>(null);
 
@@ -173,55 +173,42 @@ export default function GameField() {
   };
 
   return (
-    <div
-      className="game-field"
-      tabIndex={1}
-      ref={focusRef}
-      onKeyDown={(e) => (isRunning ? fn.changeDirection(e) : () => {})}
-    >
-      {/* {isCounting && (
-        <CountingDown
-          setRunning={setRunning}
-          disableCounting={disableCounting}
-        />
-      )} */}
-      {/* {popup.isShown && (
-        <Popup
-          type={popup.type}
-          level={level}
-          settings={settings}
-          score={gameDataRef.current.score}
-          bestScore={bestScore}
-          startGame={startGame}
-          setNewLevel={setNewLevel}
-          handleKeyDown={handleKeyDown}
-        />
-      )} */}
-      <div className="game-info">
-        <img alt="apple" src="textures/apple.png" className="apple-icon"></img>
-        <h1>{score}</h1>
-        {bestScore && settings.gamemode === "classicSnake" && (
+    game && (
+      <div
+        className="game-field"
+        tabIndex={1}
+        ref={focusRef}
+        onKeyDown={(e) => fn.handleKeyDown(e)}
+      >
+        {popup.isShown && <Popup settings={settings} bestScore={bestScore} />}
+        <div className="game-info">
           <img
-            alt="trophy"
-            src="textures/trophy.png"
-            className="trophy-icon"
+            alt="apple"
+            src="textures/apple.png"
+            className="apple-icon"
           ></img>
-        )}
-        {bestScore && settings.gamemode === "classicSnake" && (
-          <h1>{bestScore}</h1>
-        )}
-        {settings.gamemode === "bricksSnake" && (
-          <img
-            alt="level"
-            src="https://cdn3.iconfinder.com/data/icons/game-competition-flat/64/15_Top_Player_game_competition-512.png"
-            className="level-icon"
-          ></img>
-        )}
-        {settings.gamemode === "bricksSnake" && <h1>{level}</h1>}
+          <h1>{score}</h1>
+          {bestScore && game.mode === "classic" && (
+            <img
+              alt="trophy"
+              src="textures/trophy.png"
+              className="trophy-icon"
+            ></img>
+          )}
+          {bestScore && game.mode === "classic" && <h1>{bestScore}</h1>}
+          {game.mode === "bricks" && (
+            <img
+              alt="level"
+              src="https://cdn3.iconfinder.com/data/icons/game-competition-flat/64/15_Top_Player_game_competition-512.png"
+              className="level-icon"
+            ></img>
+          )}
+          {game.mode === "bricks" && <h1>{level}</h1>}
+        </div>
+        <div className="canvas-field" tabIndex={0}>
+          <canvas ref={canvasRef}></canvas>
+        </div>
       </div>
-      <div className="canvas-field" tabIndex={0}>
-        <canvas ref={canvasRef}></canvas>
-      </div>
-    </div>
+    )
   );
 }

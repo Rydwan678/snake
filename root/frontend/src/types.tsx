@@ -8,14 +8,16 @@ export type Way = "previous" | "next";
 
 export type Change = "login" | "firstname" | "lastname" | "description";
 
+export type AlertType = "error" | "warning" | "info" | "success";
+
+export type Gamemode = "classic" | "bricks" | "pvp" | "pve";
+
 type SortingMode = "ASC" | "DESC";
 
 type OrderBy = "id" | "login" | "email" | "role";
 
-export type AlertType = "error" | "warning" | "info" | "success";
-
-interface Difficulty {
-  name: string;
+export interface Difficulty {
+  name: "easy" | "normal" | "hard";
   speedPerLevel: number;
   bricksPerLevel: number;
 }
@@ -23,7 +25,6 @@ interface Difficulty {
 export interface Settings {
   audio: boolean;
   difficulty: Difficulty;
-  gamemode: string;
 }
 
 export interface User {
@@ -57,4 +58,9 @@ export interface Changes {
   firstname?: string;
   lastname?: string;
   description?: string;
+}
+
+export interface Popup {
+  isShown: boolean;
+  type: "win" | "lose" | "pause" | "level";
 }

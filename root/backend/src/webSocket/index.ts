@@ -46,5 +46,5 @@ export function load(store: Store) {
 
   setInterval(() => {
     processGames(store);
-  }, 1000);
+  }, 500);
 }

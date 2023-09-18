@@ -8,7 +8,7 @@ interface BottomBarProps {
 }
 
 function BottomBar(props: BottomBarProps) {
-  const { fn } = React.useContext(AppContext) as AppContextType;
+  const { fn, game } = React.useContext(AppContext) as AppContextType;
 
   return (
     <Box component={Paper} sx={{ padding: 2 }}>
@@ -21,7 +21,7 @@ function BottomBar(props: BottomBarProps) {
           <Button
             variant="contained"
             disabled={props.lobby.users.length < 2}
-            onClick={() => fn.startGame("multiplayer")}
+            onClick={() => fn.startGame("pvp")}
           >
             Start
           </Button>

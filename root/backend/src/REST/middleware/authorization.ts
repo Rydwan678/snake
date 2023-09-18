@@ -20,7 +20,6 @@ export default function authorization(
       return res.sendStatus(403);
     }
     req.body = { user, ...body };
-    console.log("AUTORHIZATION", req.body);
     next();
   });
 }

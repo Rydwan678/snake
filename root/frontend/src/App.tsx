@@ -9,7 +9,7 @@ import Register from "./pages/Register";
 import UserPanel from "./pages/UserPanel";
 import AdminPanel from "./pages/AdminPanel";
 import { Routes, Route, Link } from "react-router-dom";
-import { Container } from "@mui/material";
+import { Box, Container } from "@mui/material";
 import Chat from "./components/Chat";
 import { AppContext } from "./context/app";
 import useApp from "./hooks/useApp";
@@ -28,10 +28,16 @@ export default function App() {
   }, [value.game]);
 
   return (
-    <Container>
+    <Box
+      sx={{
+        height: "100%",
+        width: "100%",
+        padding: 5,
+        boxSizing: "border-box",
+      }}
+    >
       <AppContext.Provider value={value}>
-        {localStorage.getItem("token") && <Chat />}
-        <Link to="/"></Link>
+        {/* {localStorage.getItem("token") && <Chat />} */}
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -45,6 +51,6 @@ export default function App() {
         </Routes>
         <SnackbarAlert />
       </AppContext.Provider>
-    </Container>
+    </Box>
   );
 }

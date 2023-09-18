@@ -1,4 +1,5 @@
 import { Store } from "../../interfaces";
+import * as parse from "./protocols/parse";
 import * as send from "../app/protocols/send";
 
 interface GameDataTypes {
@@ -10,6 +11,7 @@ interface GameDataTypes {
   score: number;
   level: number;
   isRunning: boolean;
+  winner: undefined | number;
   popup: {
     isShown: boolean;
     type: string;
@@ -32,8 +34,9 @@ const moveSnake = (store: Store, gameID: string) => {
   // delete last part of snake and add new with updated position
   if (store.games[game]) {
     store.games[game].users.forEach((user, index) => {
-      const snakePosition = store.games[game].users[index].position;
-      const direction = store.games[game].users[index].direction;
+      const currentUser = store.games[game].users[index];
+      const snakePosition = currentUser.position;
+      const direction = currentUser.direction;
 
       let previousElementX = snakePosition[0][0];
       let previousElementY = snakePosition[0][1];
@@ -59,25 +62,21 @@ const moveSnake = (store: Store, gameID: string) => {
         updatedSnakePosition[0][1] += 64;
       }
 
-      console.log(
-        "checkCollision",
-        checkCollision(store, gameID, updatedSnakePosition)
-      );
-
       if (checkCollision(store, gameID, updatedSnakePosition) === false) {
         store.games[game].users[index].position = updatedSnakePosition;
-        console.log(
-          "updated game user position",
-          store.games[game].users[0].position
-        );
       } else if (checkCollision(store, gameID, updatedSnakePosition) === true) {
+        const gameWinner = store.games[game].users.find(
+          (user) => user.id !== currentUser.id
+        );
+        const gameLoser = currentUser;
+
         store.games[game].isRunning = false;
-        // gameDataRef.current.popup = {
-        //   isShown: !gameDataRef.current.popup.isShown,
-        //   type: settings.gamemode === "bricksSnake" ? "lose" : "end",
-        // };
+        gameWinner && (store.games[game].winner = gameWinner.id);
+        store.games[game].loser = gameLoser.id;
       }
       checkScore(store, lastSnakeElement, gameID);
+      user.id === "env" &&
+        parse.changeDirection(store, user.id, store.games[game].id, "right");
     });
   }
 };
@@ -94,37 +93,32 @@ const checkScore = (
       const snakePosition = store.games[game].users[index].position;
       const applePosition = store.games[game].applePosition;
       const score = store.games[game].users[index].score;
-      if (
-        snakePosition[0][0] === applePosition[0] &&
-        snakePosition[0][1] === applePosition[1]
-      ) {
-        // const eatSound = new Audio("sounds/eatsound.mp3");
-        // settings.audio && eatSound.play();
-        store.games[game].users[index].score = score + 1;
-        store.games[game].users[index].position.push(lastSnakeElement);
 
-        setApple(store, gameID);
+      if (applePosition) {
+        if (
+          snakePosition[0][0] === applePosition[0] &&
+          snakePosition[0][1] === applePosition[1]
+        ) {
+          // const eatSound = new Audio("sounds/eatsound.mp3");
+          // settings.audio && eatSound.play();
+          store.games[game].users[index].score = score + 1;
+          store.games[game].users[index].position.push(lastSnakeElement);
 
-        // if (settings.gamemode === "bricksSnake" && score + 1 === 10) {
-        //   if (gameDataRef.current.level < 9) {
-        //     gameDataRef.current.isRunning = false;
-        //     gameDataRef.current.popup = {
-        //       isShown: !gameDataRef.current.popup.isShown,
-        //       type: "nextLevel",
-        //     };
-        //   } else if (gameDataRef.current.level === 9) {
-        //     gameDataRef.current.level = 10;
-        //     gameDataRef.current.score = 0;
-        //     gameDataRef.current.isRunning = false;
-        //     gameDataRef.current.popup = {
-        //       isShown: !gameDataRef.current.popup.isShown,
-        //       type: "win",
-        //     };
-        //   }
-        // }
-        return true;
-      } else {
-        return false;
+          setApple(store, gameID);
+
+          if (store.games[game].mode === "bricks" && score + 1 === 10) {
+            if (store.games[game].level < 9) {
+              store.games[game].isRunning = false;
+            } else if (store.games[game].level === 9) {
+              store.games[game].level = 10;
+              store.games[game].users[index].score = 0;
+              store.games[game].isRunning = false;
+            }
+          }
+          return true;
+        } else {
+          return false;
+        }
       }
     });
   }
@@ -169,6 +163,24 @@ const checkCollision = (
         return true;
       }
     }
+    // check if snake collided with another player
+    for (let i = 0; i < store.games[game].users.length; i++) {
+      const currentUser = store.games[game].users[i];
+      const enemy = store.games[game].users.find(
+        (user) => user.id !== currentUser.id
+      );
+
+      store.games[game].users[i].position.forEach((coordinates) => {
+        if (
+          coordinates[0] === snakeHeadPositionX &&
+          coordinates[1] === snakeHeadPositionY
+        ) {
+          store.games[game].isRunning = false;
+          store.games[game].loser = currentUser.id;
+          store.games[game].winner = enemy?.id;
+        }
+      });
+    }
     // check if snake collided with game border
     if (
       snakeHeadPositionX < 0 ||
@@ -193,18 +205,17 @@ const getRandomPosition = () => {
   return randomNumber;
 };
 
-const setApple = (store: Store, gameID: string) => {
+export const setApple = (store: Store, gameID: string) => {
   const game = store.games.findIndex((game) => game.id === gameID);
 
   if (store.games[game]) {
-    const bricksPosition = store.games[game].bricksPosition;
-
     let positionX = getRandomPosition();
     let positionY = getRandomPosition();
 
-    const apple = [positionX, positionY];
-    // if apple has been spawned in player, create new position
+    const apple: [number, number] = [positionX, positionY];
+    const bricksPosition = store.games[game].bricksPosition;
 
+    // if apple has been spawned in player, create new position
     store.games[game].users.forEach((user, index) => {
       const snakePosition = store.games[game].users[index].position;
 
@@ -214,16 +225,19 @@ const setApple = (store: Store, gameID: string) => {
           snakePosition[index][1] === apple[1]
         ) {
           setApple(store, gameID);
+          return;
         }
       });
     });
     // if apple has been spawned in brick, create new position
+
     bricksPosition.forEach((position, index) => {
       if (
         bricksPosition[index][0] === apple[0] &&
         bricksPosition[index][1] === apple[1]
       ) {
         setApple(store, gameID);
+        return;
       }
     });
     // if apple has been spawned in blind alley, create new position
@@ -234,63 +248,43 @@ const setApple = (store: Store, gameID: string) => {
       [apple[0] + 64, apple[1]],
     ];
     let counter = 0;
-    for (let i = 0; i < bricksPosition.length; i++) {}
-    bricksPosition.forEach((position, i) => {
-      appleAdjacentFields.forEach((field, x) => {
+    for (let i = 0; i < bricksPosition.length; i++) {
+      for (let x = 0; x < appleAdjacentFields.length; x++) {
         if (
           bricksPosition[i][0] === appleAdjacentFields[x][0] &&
           bricksPosition[i][1] === appleAdjacentFields[x][1]
         ) {
           counter += 1;
         }
-      });
+      }
       if (counter === 3) {
         setApple(store, gameID);
+        return;
       }
-    });
+    }
+    store.games[game].applePosition = apple;
   }
 };
 
-// const setBricks = (store: Store, gameID: string) => {
-//   const game = store.games.findIndex((game) => game.id === gameID);
+export const setBricks = (store: Store, gameID: string) => {
+  const game = store.games.findIndex((game) => game.id === gameID);
+  const bricksPerLevel = 5;
 
-//   if (store.games[game]) {
-//     const bricksPosition = store.games[game].bricksPosition;
-//     for (let i = 0; i < settings.difficulty.bricksPerLevel; i++) {
-//       let positionX = getRandomPosition();
-//       let positionY = getRandomPosition();
-//       bricksPosition.push([positionX, positionY]);
-//       // remove brick when it has been spawned too close to snake start
-//       let lastBrick = bricksPosition[bricksPosition.length - 1];
-//       if (lastBrick[0] < 512 && lastBrick[1] === 0) {
-//         bricksPosition.pop();
-//       }
-//     }
-//   }
-// };
-
-// const setNewLevel = () => {
-//   gameDataRef.current.level += 1;
-//   gameDataRef.current.score = 0;
-//   if (gameDataRef.current.level !== 10) {
-//     gameDataRef.current.snakePosition = [
-//       [192, 0],
-//       [128, 0],
-//       [64, 0],
-//       [0, 0],
-//     ];
-//     gameDataRef.current.direction = "right";
-//     gameDataRef.current.speed -= settings.difficulty.speedPerLevel;
-//     gameDataRef.current.popup = {
-//       isShown: false,
-//       type: "",
-//     };
-
-//     setBricks();
-//     setApple();
-//     gameDataRef.current.isCounting = true;
-//   }
-// };
+  if (store.games[game]) {
+    const bricksPosition = store.games[game].bricksPosition;
+    for (let i = 0; i < bricksPerLevel; i++) {
+      let positionX = getRandomPosition();
+      let positionY = getRandomPosition();
+      bricksPosition.push([positionX, positionY]);
+      // remove brick when it has been spawned too close to snake start
+      let lastBrick = bricksPosition[bricksPosition.length - 1];
+      if (lastBrick[0] < 512 && lastBrick[1] === 0) {
+        bricksPosition.pop();
+      }
+    }
+    send.game(store, gameID);
+  }
+};
 
 // const setBestScore = () => {
 //   const storedBestScore = parseInt(`${localStorage.getItem("bestscore")}`);

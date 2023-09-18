@@ -37,8 +37,19 @@ export default function game(
       );
     }
   } else if (packet.packetId === "start") {
-    parse.start(store, userID, packet.data.game.lobbyID);
+    parse.start(store, userID, packet.data.game.lobbyID, packet.data.game.mode);
   } else if (packet.packetId === "move") {
-    parse.move(store, userID, packet.data.game.id, packet.data.game.to);
+    parse.changeDirection(
+      store,
+      userID,
+      packet.data.game.id,
+      packet.data.game.to
+    );
+  } else if (packet.packetId === "pause") {
+    parse.pause(store, userID, packet.data.game.id);
+  } else if (packet.packetId === "leaveGame") {
+    parse.leaveGame(store, userID, packet.data.game.id);
+  } else if (packet.packetId === "nextLevel") {
+    parse.setNewLevel(store, packet.data.game.id);
   }
 }

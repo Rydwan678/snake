@@ -12,7 +12,7 @@ export default function Play() {
         <Link to="/game">
           <Button
             onClick={() => {
-              fn.startGame("singleplayer");
+              fn.startGame("classic");
             }}
             variant="contained"
           >
@@ -23,21 +23,26 @@ export default function Play() {
         <Link to="/game">
           <Button
             onClick={() => {
-              fn.changeGamemode("bricksSnake");
+              fn.startGame("bricks");
             }}
             variant="contained"
           >
             Bricks Snake
           </Button>
         </Link>
+
         <Link to="/lobby">
+          <Button variant="contained">Multiplayer</Button>
+        </Link>
+
+        <Link to="/game">
           <Button
-            onClick={() => {
-              fn.changeGamemode("multiplayer");
+            onClick={async () => {
+              fn.startGame("pve");
             }}
             variant="contained"
           >
-            Multiplayer
+            PvE
           </Button>
         </Link>
       </Stack>

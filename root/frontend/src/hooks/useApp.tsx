@@ -1,4 +1,3 @@
-import { FiberNew } from "@mui/icons-material";
 import React, { useState, useEffect, useRef } from "react";
 import {
   Packet,
@@ -9,25 +8,34 @@ import {
   Direction,
 } from "../../../shared/interfaces";
 import { getMe } from "../ApiServices";
-import { Settings, Setting, Alert, AlertType } from "../types";
+import {
+  Settings,
+  Setting,
+  Alert,
+  AlertType,
+  Gamemode,
+  Difficulty,
+} from "../types";
 
 export default function useApp() {
   const [users, setUsers] = useState<User[]>();
   const [lobbies, setLobbies] = useState<LobbyType[] | null>(null);
   const [me, setMe] = useState<number>();
   const [lobby, setLobby] = useState<LobbyType | null>(null);
+  const [game, setGame] = useState<Game | null>(null);
   const [recipient, setRecipient] = useState<number>();
   const [settings, setSettings] = useState<Settings>({
     audio: true,
     difficulty: {
-      name: "NORMAL",
+      name: "normal",
       speedPerLevel: 12,
       bricksPerLevel: 5,
     },
-    gamemode: "",
   });
-
-  const [game, setGame] = useState<Game | null>(null);
+  const [popup, setPopup] = useState({
+    isShown: false,
+    type: "",
+  });
 
   const [alert, setAlert] = useState<Alert>({
     open: false,
@@ -109,6 +117,7 @@ export default function useApp() {
         }
 
         if (packet.packetId === "gameInfo") {
+          console.log("gameInfo");
           setGame(packet.data.game.data);
         }
 
@@ -144,9 +153,11 @@ export default function useApp() {
   useEffect(() => {
     async function webSocketConnection() {
       const response = await getMe(localStorage.getItem("token"));
+
       setMe(response[0].id);
 
       ws.current = new WebSocket("ws://localhost:8080");
+      console.log("on render WS", ws.current);
       ws.current.onopen = (e) => {
         if (localStorage.getItem("token")) {
           console.log("open");
@@ -178,7 +189,7 @@ export default function useApp() {
         );
       } else {
         console.log("Server is closed. Trying to reconnect");
-        reconnect();
+        webSocketConnection();
         return;
       }
     }, 1000);
@@ -213,6 +224,55 @@ export default function useApp() {
   }, [alert && users]);
 
   useEffect(() => {
+    if (game) {
+      game.mode === "bricks" && game.users[0].score >= 10
+        ? setPopup({
+            isShown: true,
+            type: "level",
+          })
+        : setPopup({
+            isShown: false,
+            type: "level",
+          });
+
+      game.loser &&
+        game.loser === me &&
+        setPopup({
+          isShown: true,
+          type: "lose",
+        });
+
+      game.winner &&
+        game.winner === me &&
+        setPopup({
+          isShown: true,
+          type: "win",
+        });
+
+      !game.isRunning &&
+        !game.winner &&
+        !game.loser &&
+        setPopup({
+          isShown: true,
+          type: "pause",
+        });
+
+      !game.isRunning &&
+        !game.winner &&
+        !game.loser &&
+        game.isRunning &&
+        setPopup({
+          isShown: false,
+          type: "pause",
+        });
+    }
+  }, [game]);
+
+  useEffect(() => {
+    console.log(popup);
+  }, [popup]);
+
+  useEffect(() => {
     if (users) {
       const meIndex = users.findIndex((user) => user.id === me);
 
@@ -236,11 +296,6 @@ export default function useApp() {
         data: { userToken: localStorage.getItem("token") as string },
       })
     );
-  }
-
-  function reconnect() {
-    ws.current?.close();
-    ws.current = new WebSocket("ws://localhost:8080");
   }
 
   function changeRecipient(id: number) {
@@ -396,19 +451,19 @@ export default function useApp() {
   }
 
   function changeDifficulty() {
-    const levels = [
+    const levels: Difficulty[] = [
       {
-        name: "EASY",
+        name: "easy",
         speedPerLevel: 6,
         bricksPerLevel: 4,
       },
       {
-        name: "NORMAL",
+        name: "normal",
         speedPerLevel: 12,
         bricksPerLevel: 5,
       },
       {
-        name: "HARD",
+        name: "hard",
         speedPerLevel: 18,
         bricksPerLevel: 6,
       },
@@ -422,13 +477,6 @@ export default function useApp() {
     setSettings((previousSettings) => ({
       ...previousSettings,
       difficulty: nextLevel,
-    }));
-  }
-
-  function changeGamemode(selectedGamemode: string) {
-    setSettings((previousSettings) => ({
-      ...previousSettings,
-      gamemode: selectedGamemode,
     }));
   }
 
@@ -595,9 +643,9 @@ export default function useApp() {
     }
   }
 
-  async function startGame() {
-    console.log("startwr", lobby ? lobby.id : null);
+  async function startGame(gamemode: Gamemode) {
     try {
+      console.log("STARTING GAME WITH MODE", gamemode);
       await ws.current?.send(
         JSON.stringify({
           module: "game",
@@ -605,6 +653,7 @@ export default function useApp() {
           data: {
             game: {
               lobbyID: lobby ? lobby.id : null,
+              mode: gamemode,
             },
             userToken: localStorage.getItem("token"),
           },
@@ -615,11 +664,52 @@ export default function useApp() {
     }
   }
 
-  async function changeDirection(e: React.KeyboardEvent) {
+  async function pauseGame() {
+    try {
+      game &&
+        (await ws.current?.send(
+          JSON.stringify({
+            module: "game",
+            packetId: "pause",
+            data: {
+              game: {
+                id: game.id,
+              },
+              userToken: localStorage.getItem("token"),
+            },
+          })
+        ));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function leaveGame() {
+    try {
+      game &&
+        (await ws.current?.send(
+          JSON.stringify({
+            module: "game",
+            packetId: "leaveGame",
+            data: {
+              game: {
+                id: game.id,
+              },
+              userToken: localStorage.getItem("token"),
+            },
+          })
+        ));
+      setGame(null);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function handleKeyDown(e: React.KeyboardEvent) {
     if (game) {
       let direction = game.users.find((user) => user.id === me)?.direction;
 
-      if (direction) {
+      if (direction && game.isRunning) {
         if (e.key === "w") {
           if (direction !== "down") {
             direction = "up";
@@ -657,14 +747,9 @@ export default function useApp() {
         }
       }
 
-      // if (e.key === "Escape") {
-      //   console.log("test");
-      //   gameDataRef.current.isRunning = !gameDataRef.current.isRunning;
-      //   gameDataRef.current.popup = {
-      //     isShown: !gameDataRef.current.popup.isShown,
-      //     type: "gamePaused",
-      //   };
-      // }
+      if (e.key === "Escape") {
+        pauseGame();
+      }
     }
   }
 
@@ -682,6 +767,26 @@ export default function useApp() {
         type: type,
         message: message,
       });
+    }
+  }
+
+  async function nextLevel() {
+    try {
+      game &&
+        (await ws.current?.send(
+          JSON.stringify({
+            module: "game",
+            packetId: "nextLevel",
+            data: {
+              game: {
+                id: game.id,
+              },
+              userToken: localStorage.getItem("token"),
+            },
+          })
+        ));
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -712,11 +817,11 @@ export default function useApp() {
     settings: settings,
     game: game,
     alert: alert,
+    popup: popup,
     fn: {
       sendMessage: sendMessage,
       changeRecipient: changeRecipient,
       sendReadStatus: sendReadStatus,
-      changeGamemode: changeGamemode,
       changeDifficulty: changeDifficulty,
       toggleSetting: toggleSetting,
       connect: connect,
@@ -729,7 +834,11 @@ export default function useApp() {
       showAlert: showAlert,
       handleAlertClose: handleAlertClose,
       startGame: startGame,
-      changeDirection: changeDirection,
+      pauseGame: pauseGame,
+      leaveGame: leaveGame,
+      handleKeyDown: handleKeyDown,
+      setPopup: setPopup,
+      nextLevel: nextLevel,
     },
   };
 }

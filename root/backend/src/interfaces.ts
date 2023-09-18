@@ -2,6 +2,7 @@ import { Express } from "express";
 import { Server } from "http";
 import WebSocket from "ws";
 
+export type Gamemode = "classic" | "bricks" | "pvp" | "pve";
 interface Invite {
   id: string;
   from: number;
@@ -38,17 +39,22 @@ export type Direction = "left" | "right" | "up" | "down";
 
 interface Game {
   id: string;
+  mode: Gamemode;
   users: {
-    id: number;
+    id: number | "env";
     position: [number, number][];
     direction: Direction;
     score: number;
+    speed: number;
   }[];
-  speed: number;
-  applePosition: [number, number];
+
+  level: number;
+  applePosition: [number, number] | undefined;
   bricksPosition: [number, number][];
   isRunning: boolean;
   isCounting: boolean;
+  winner: undefined | number | "env";
+  loser: undefined | number | "env";
 }
 
 interface Message {
@@ -87,6 +93,7 @@ interface Data {
     data: Game;
     lobbyID: string | null;
     to: Direction;
+    mode: Gamemode;
   };
   userID?: number;
   userToken: string;
@@ -105,6 +112,9 @@ export interface Packet {
     | "messageInfo"
     | "lobby"
     | "start"
-    | "move";
+    | "move"
+    | "pause"
+    | "leaveGame"
+    | "nextLevel";
   data: Data;
 }

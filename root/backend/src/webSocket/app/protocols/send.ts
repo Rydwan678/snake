@@ -18,7 +18,8 @@ export function users(store: Store, userID: number) {
 }
 
 export function usersForEveryone(store: Store) {
-  store.users.forEach((user) =>
+  store.users.forEach((user) => {
+    console.log("sending users", user.id);
     user?.ws.send(
       JSON.stringify({
         packetId: "getUsers",
@@ -30,8 +31,8 @@ export function usersForEveryone(store: Store) {
           })),
         },
       })
-    )
-  );
+    );
+  });
 }
 
 export function lobbies(store: Store, userID: number) {
@@ -48,8 +49,6 @@ export function lobbies(store: Store, userID: number) {
       },
     })
   );
-
-  console.log("send getLobbies", userID);
 }
 
 export function lobbiesForEveryone(store: Store) {
