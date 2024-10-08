@@ -1,6 +1,6 @@
 # SNAKE
 
-Complex Snake game developed by me since May 2021. It was originally coded in pure JavaScript, then ported to React, and now it is made with TypeScript with backend working on Express.
+Complex Snake game developed by me since May 2022. It was originally coded in pure JavaScript, then ported to React, and now it is made with TypeScript with backend working on Express.
 
 #
 
